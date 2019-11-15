@@ -2,6 +2,7 @@
 var io = require('socket.io-client');
 var store = require('./repository');
 var querystring = require('querystring');
+var tradinghttp = require(store.config.trading_api_proto);
 var globalRequestID = 1;
 var request_headers = {
 	'User-Agent': 'request',

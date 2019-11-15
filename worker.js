@@ -50,4 +50,5 @@ async function updateSotreParams () {
   // Load pair parameters
   
    updateSotreParams();
-  task.start();
+   updateCandles();
+ // task.start();

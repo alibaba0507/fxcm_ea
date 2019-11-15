@@ -12,7 +12,7 @@ module.exports.subscibe = async () => {
 		if (statusCode === 200 && data && data != '') {
 			try {
 				var jsonData = JSON.parse(data);
-				let id = store.store.get('subscribe');
+				let id = store.get('subscribe');
 				/*console.log(' >>>>> SUBSCRIBE reqId[' + requestID 
 						+ '] satatus [' + statusCode + '] data [' 
 						+ data + '] ID [' + id + '] >>>>>>>>>>>>>>>>>>')
