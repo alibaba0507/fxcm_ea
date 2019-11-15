@@ -8,7 +8,7 @@ module.exports.sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
   }
 module.exports.subscibe = async () => {
-	var callback = (statusCode, requestID, data,err) => {
+	var callback = (statusCode, requestID, data,err,indx,socket) => {
 		if (statusCode === 200 && data && data != '') {
 			try {
 				var jsonData = JSON.parse(data);
@@ -34,7 +34,7 @@ module.exports.subscibe = async () => {
 					}
 				} catch (e) {
 					console.log('subscribe request #', requestID, ' "pairs" JSON parse error: ', e);
-					store.store.set('subscribe',"0");
+					store.set('subscribe',"0");
 					return;
 				}
 			} else {
@@ -141,7 +141,8 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
 module.exports.priceUpdate = async (update) => {
 	try {
 	
-		var jsonData = JSON.parse(update);
+        var jsonData = JSON.parse(update);
+       // console.log(jsonData);
 		let candles = store.get(jsonData.Symbol.toString());
 		if (candles) candles = JSON.parse(candles);
 		else {return;}

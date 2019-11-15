@@ -17,7 +17,7 @@ var request_headers = {
  * this is not recomended for subscription cause will cause
  * lock of all program
  * @param {*} command 
- * @param {*} callback - callback(response.statusCode, requestID, data,error,indx);
+ * @param {*} callback - callback(response.statusCode, requestID, data,error,indx,socket);
  * @param {*} indx 
  */
 module.exports.authenticate = async (command,callback,indx=0) =>{
@@ -34,7 +34,7 @@ module.exports.authenticate = async (command,callback,indx=0) =>{
     if (typeof callback === 'undefined')
     {
         callback = (statusCode,reqId,data,err,indx)=>{
-            return {"statusCode":statusCode,"reqId":reqId,"data":data,"error":err,"id":socket.id};
+			return {"statusCode":statusCode,"reqId":reqId,"data":data,"error":err,"id":socket.id,"soket":socket};
         };
     }
     // fired when socket.io connects with no errors
@@ -42,7 +42,7 @@ module.exports.authenticate = async (command,callback,indx=0) =>{
 		console.log('Socket.IO session has been opened: ', socket.id);
 		console.log('@@@@@@@ OPEN SOCKET ',command);
 		request_headers.Authorization = 'Bearer ' + socket.id + store.config.token;
-		processData(command,callback,indx);
+		processData(command,callback,indx,socket);
     });
     
     // fired when socket.io cannot connect (network errors)
@@ -75,7 +75,7 @@ module.exports.authenticate = async (command,callback,indx=0) =>{
  * @param {*} callback 
  * @param {*} indx 
  */
-function processData(data,callback,indx)
+function processData(data,callback,indx,socket)
 {
     var input = data.toString().trim();
 
@@ -99,7 +99,7 @@ function processData(data,callback,indx)
           var jPrams = JSON.parse(params);
                         //jPrams.callback = callback;
                         console.log(" >>>>>>>>>>>>> SENDING ",jPrams);
-           send(jPrams,callback,indx);    
+           send(jPrams,callback,indx,socket);    
     } catch (e) {
             console.log('could not parse JSON parameters: ', e);
         }
@@ -113,7 +113,7 @@ function processData(data,callback,indx)
  * @param {*} callback 
  * @param {*} indx 
  */
-function send (params,callback,indx)
+function send (params,callback,indx,socket)
 {
     if (typeof(params.params) === 'undefined') {
 		params.params = '';
@@ -130,13 +130,13 @@ function send (params,callback,indx)
 	//	console.log('@@@@@ CallBACK <<<<<< ', callback);
 		params.params = querystring.stringify(params.params);
 	//	console.log('@@@@@ PARAMS <<<<<< ', 	params.params);
-		request_processor(params.method, params.resource, params.params, callback,indx);
+		request_processor(params.method, params.resource, params.params, callback,indx,socket);
 		//console.log('@@@@@ AFTER CallBACK <<<<<< ');
 	}
 }
 
 
-function request_processor (method, resource, params, callback,indx) {
+function request_processor (method, resource, params, callback,indx,socket) {
     var requestID = getNextRequestID();
     try {
 		
@@ -169,9 +169,9 @@ function request_processor (method, resource, params, callback,indx) {
                 let jObj = JSON.parse(data).response;
                 if (jObj.executed == false)
                 {
-                    callback(response.statusCode, requestID, '',jObj.error,indx);
+                    callback(response.statusCode, requestID, '',jObj.error,indx,socket);
                 }else
-                    callback(response.statusCode, requestID, data,null,indx);
+                    callback(response.statusCode, requestID, data,null,indx,socket);
                 console.log(' ++++++++++ After CallBack ++++++++++++');
 				
 			});

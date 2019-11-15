@@ -10,12 +10,13 @@ async function updateCandles  (){
     trading = JSON.parse(trading);
     //let loadPairs = store.get(rep.storeKey.trading);
     //loadPairs = JSON.parse(loadPairs);
-    candles.subscibe();
-    await candles.sleep(5000);
+   
     for (let i = 0;i < trading.length;i++)
     {
         await candles.loadCandles(i);
     }
+    candles.subscibe();
+    await candles.sleep(5000);
    
 }
 
