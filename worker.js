@@ -1,7 +1,6 @@
 let rep = require('./repository');
 let fs = require('fs');
 let candles = require('./fxcm_data');
-let rep = require('./repository');
 let storeKey = require('./repository').storeKey;
 var cron = require('node-cron');
 
@@ -11,12 +10,13 @@ async function updateCandles  (){
     trading = JSON.parse(trading);
     //let loadPairs = store.get(rep.storeKey.trading);
     //loadPairs = JSON.parse(loadPairs);
+    candles.subscibe();
+    await candles.sleep(5000);
     for (let i = 0;i < trading.length;i++)
     {
         await candles.loadCandles(i);
     }
-    candles.subscibe();
-    await candles.sleep(5000);
+   
 }
 
 
@@ -43,10 +43,11 @@ async function updateSotreParams () {
   var task = cron.schedule('* * * * *', () => {
     let savedPairs = fs.readFileSync('pairs.txt').toString();
     console.log(' >>>>> PING SERVER EVERY 1 MIN WORKER ....>>>>>');
-    await updateCandles();
-    if ((new Date().getMinutes() % 5) == 0) { runTask(); }
+     //updateCandles();
+    if ((new Date().getMinutes() % 5) == 0) { updateCandles(); }
   });
 
   // Load pair parameters
-  await updateSotreParams();
+  
+   updateSotreParams();
   task.start();

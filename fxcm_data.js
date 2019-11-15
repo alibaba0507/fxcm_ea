@@ -56,7 +56,7 @@ module.exports.subscibe = async () => {
             p.push(trading[i].pair)
         }
         console.log(' >>>>>> push ', p);
-        let pairs = JSON.stringify(pairs);
+        let pairs = JSON.stringify(p);
         console.log(' >>>>>> PAIRS TO SUBSCRIBE >>>>> ',pairs);
         let action = store.get('subscribe');
         if (typeof action === 'undefined')
