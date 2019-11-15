@@ -1,0 +1,25 @@
+{
+	"name": "fxcm-connect",
+	"version": "0.0.1",
+	"description": "will run on heroku , tick server with some basic indicator calculation",
+	"dependencies": {
+		"body-parser": "^1.18.3",
+		"express": "^4.16.4",
+		"node-cron": "^2.0.3",
+		"nodemailer": "^5.1.1",
+		"nunjucks": "^3.2.0",
+		"request": "^2.88.0",
+		"scattered-store": "^1.0.1",
+		"socket.io-client": "^2.2.0"
+	},
+	"devDependencies": {},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node worker.js"
+	},
+	"engines": {
+		"node": "11.12.0"
+	},
+	"author": "fx2go4u@gmail.com",
+	"license": "ISC"
+}
