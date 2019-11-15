@@ -19,18 +19,18 @@ module.exports.subscibe = async () => {
 				*/
 				if (id != requestID)
 				{
-					store.store.set('subscribe',requestID);
+					store.set('subscribe',requestID);
 				}
 			} catch (e) {
 				console.log('subscribe request #', requestID, ' JSON parse error: ', e , ' data ',data);
-				store.store.set('subscribe',"0");
+				store.set('subscribe',"0");
 				mail('FXCM Pair subscribe Error','subscribe request #'+ requestID+ ' JSON parse error: '+ e + ' data '+data)
 				return;
 			}
 			if(jsonData.response.executed) {
 				try {
 					for(var i in jsonData.pairs) {
-						socket.on(jsonData.pairs[i].Symbol, priceUpdate);
+						socket.on(jsonData.pairs[i].Symbol, this.priceUpdate);
 					}
 				} catch (e) {
 					console.log('subscribe request #', requestID, ' "pairs" JSON parse error: ', e);
@@ -39,14 +39,14 @@ module.exports.subscibe = async () => {
 				}
 			} else {
 				console.log('subscribe request #', requestID, ' not executed: ', jsonData);
-			    store.store.set('subscribe',"0");
+			    store.set('subscribe',"0");
 			}
 		} else {
-			store.store.set('subscribe',"0");
+			store.set('subscribe',"0");
 			console.log('subscribe request #', requestID, ' execution error: ', statusCode, ' : Err', err);
 		}
     }
-    let trading = rep.store.get(storeKey.trading);
+    let trading = store.get(storeKey.trading);
     //trading[indx].pair
     if (trading) {
         trading = JSON.parse(trading);
@@ -58,15 +58,17 @@ module.exports.subscibe = async () => {
         console.log(' >>>>>> push ', p);
         let pairs = JSON.stringify(pairs);
         console.log(' >>>>>> PAIRS TO SUBSCRIBE >>>>> ',pairs);
-        let action = store.store.get('subscribe');
+        let action = store.get('subscribe');
         if (typeof action === 'undefined')
         {
             conn.authenticate('{ "method":"POST", "resource":"/subscribe", "params": { "pairs":' + pairs + '}}', callback );
             await this.sleep(2000);
         }else if (action == "0")
-        {	
+        {	// something went wrong we will try again
             await conn.authenticate('{ "method":"POST", "resource":"/unsubscribe", "params": { "pairs":' + pairs + '}}');
+            store.delete('subscribe');
             await this.sleep(2000);
+            this.subscibe();
         }  
     }
 	
@@ -136,7 +138,86 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
     }
 }
 
+module.exports.priceUpdate = async (update) => {
+	try {
+	
+		var jsonData = JSON.parse(update);
+		let candles = store.get(jsonData.Symbol.toString());
+		if (candles) candles = JSON.parse(candles);
+		else {return;}
+		// JavaScript floating point arithmetic is not accurate, so we need to round rates to 5 digits
+		// Be aware that .toFixed returns a String
+		jsonData.Rates = jsonData.Rates.map(function(element){
+			return element.toFixed(5);
+		});
+	
+		let now = new Date();
+		let newCandle = false;
+		newCandle =((new Date(Number(jsonData.Updated)).getMinutes() % 5) == 1);
+		if (newCandle == true && candles && candles.length > 0)
+		{
+			newCandle =  (new Date(Number(jsonData.Updated)).getMinutes()
+			       != new Date(Number(candles[0][0])*1000).getMinutes());
+		}
+		if (newCandle == true && candles && candles.length > 0)
+		{
+			//if (candles && candles.length > 0)
+			//{
+				console.log('  ++++++++ ###### @@@@@@@@ ====[' + jsonData.Symbol.toString() 
+				+ '] [' + 
+			  	new Date(Number(jsonData.Updated)).getMinutes()
+				 	+ '][' + new Date(Number(candles[0][0])*1000).getMinutes() 
+				 	+ '] CANDLES [' + candles.length + ']==========');
+			//}
+			let cndl = new Array();
+			cndl.push(Number(jsonData.Updated)/1000);
+			cndl.push(jsonData.Rates[0]);
+			cndl.push(jsonData.Rates[0]);
+			cndl.push(jsonData.Rates[0]);
+			cndl.push(jsonData.Rates[0]);
+			cndl.push(jsonData.Rates[1]);
+			cndl.push(jsonData.Rates[1]);
+			cndl.push(jsonData.Rates[1]);
+			cndl.push(jsonData.Rates[1]);
+			//cndl.push('Y');// mark we been here
+			candles.unshift (cndl);// add item at the begining of array
+			//console.log(' ><<<<<<< CANDLE [' + candles[0][9] + '>>>>>>');
+			store.set(jsonData.Symbol.toString(),JSON.stringify(candles));
+			//store.candleParams.
+		}else if (candles)
+		{
+		//	if ((now.getMinutes() % 5) != 0)
+		//	  candles[0][9] = '';
+			candles[0][0] = Number(jsonData.Updated)/1000;
+			candles[0][2] = jsonData.Rates[0]; // close Bid
+			candles[0][6] = jsonData.Rates[0]; // close Ask
 
+			if (Number(candles[0][3]) < Number(jsonData.Rates[0]))
+			 {candles[0][3] = jsonData.Rates[0]}
+			 if (Number(candles[0][7]) < Number(jsonData.Rates[1]))
+			 {candles[0][7] = jsonData.Rates[1]}
+			
+			if (Number(candles[0][4]) > Number(jsonData.Rates[0]))
+			 {candles[0][4] = jsonData.Rates[0]}
+			 if (Number(candles[0][8]) > Number(jsonData.Rates[1]))
+			 {candles[0][8] = jsonData.Rates[1]}
+			 store.set(jsonData.Symbol.toString(),JSON.stringify(candles));
+		}
+		/*if (candles)
+		{
+		let d = new Date(Number(candles[0][0])*1000);
+		let l = candles.length;
+	  store.store.set(jsonData.Symbol.toString() + '_candleUpdate',now.getTime());
+		//console.log('@[' + l + '][' + d.toUTCString() + '] ] Price update of [' + jsonData.Symbol + 
+	  //                ']: [' + candles[0][store.candleParams.BidClose] + ']');
+		}*/
+	//	else 
+	//	    console.log(`@[${jsonData.Updated}] Price update of [${jsonData.Symbol}]: ${jsonData.Rates}`);
+	} catch (e) {
+		console.log('price update JSON parse error: ', e);
+		return;
+	}
+}
 async function updateCandles (data, jobj, cndlCount, element)  {
     let dt = JSON.parse(data);
     // this is new Candles
