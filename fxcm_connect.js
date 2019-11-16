@@ -1,4 +1,11 @@
-
+/**
+ *  This is connection module, will establish socket connection
+ * to fxcm to query or subscribe to fxcm tables , 
+ * if callback is define will send back socket object , 
+ * which is important for subscription.
+ * callback(response.statusCode, requestID, data,error,indx,socket)
+ * @module.exports.authenticate
+ */
 var io = require('socket.io-client');
 var store = require('./repository');
 var querystring = require('querystring');

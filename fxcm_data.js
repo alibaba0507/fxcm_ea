@@ -1,4 +1,9 @@
-
+/**
+ * Will be responsible for server tick data manipulation
+ * like convert to candle with time stump , convert to different 
+ * time frames candles and so on...
+ * 
+ */
 var rep = require('./repository');
 var store = require('./repository').store
 var conn = require('./fxcm_connect');
@@ -88,8 +93,10 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
             //console.log(' >>>>>>>> loadHistCandles LOADED PAIRS >>>>',loadPairs);
             let candles = store.get(loadPairs[indx].pair);
             if (typeof candles === 'undefined')
-               return {"eer":"No candles for pair [" + loadPairs[indx].pair+"]"};
-
+            {
+               candles = []; // intilize it so we can fill it with array
+              //return {"eer":"No candles for pair [" + loadPairs[indx].pair+"]"};
+            }
             jsonCandles = JSON.parse(candles);
             jsonCandles.sort((a, b) => {
                 return (b[0] - a[0]); // sort decending by time where newest time is first
@@ -219,6 +226,48 @@ module.exports.priceUpdate = async (update) => {
 		return;
 	}
 }
+
+module.exports.convertCandlesByTime = async (candles, time = 15) =>
+{
+  let tfCandles = [];
+  let candleIndx = [];
+  if (Array.isArray(candles)) {
+    for (var i = 0; i < candles.length; i++) {
+      let d = new Date(Number(candles[i][0]) * 1000);
+     
+      if (i == 0  
+          || d.getMinutes() == time 
+            || d.getMinutes() == 0 
+              || (d.getMinutes() > time 
+              && d.getMinutes()%time == 0 ))
+      {
+        if (candleIndx.length > 0)
+        {
+         candleIndx[rep.candleParams.BidClose] = candles[i][rep.candleParams.BidClose];
+         candleIndx[rep.candleParams.AskClose] = candles[i][rep.candleParams.AskClose];
+         tfCandles.push(candleIndx);
+        }
+        candleIndx = candles[i];
+      }else{
+        if (Number(candleIndx[rep.candleParams.AskHigh]) < 
+              Number(candles[i][rep.candleParams.AskHigh]))
+          {
+            candleIndx[rep.candleParams.BidHigh] = candles[i][rep.candleParams.BidHigh];
+            candleIndx[rep.candleParams.AskHigh] = candles[i][rep.candleParams.AskHigh];
+          }
+          if (Number(candleIndx[rep.candleParams.BidLow]) > 
+              Number(candles[i][rep.candleParams.BidLow]))
+          {
+            candleIndx[rep.candleParams.BidLow] = candles[i][rep.candleParams.BidLow];
+            candleIndx[rep.candleParams.AskLow] = candles[i][rep.candleParams.AskLow];
+          }
+      }// end else
+        
+    }// end for 
+  }
+  return tfCandles;
+}
+
 async function updateCandles (data, jobj, cndlCount, element)  {
     let dt = JSON.parse(data);
     // this is new Candles
