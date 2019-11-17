@@ -10,7 +10,7 @@
  */
  module.exports.macd = async (candles,FastMAPeriod = 12,SlowMAPeriod = 26,SignalMAPeriod = 9
     ,returBuffer = 0)=>{
-    let pos=candles.length-26;
+    let pos=candles.length-SlowMAPeriod;
     let SignalLineBuffer = new Array(candles.length).fill(0);
     let MACDLineBuffer  = new Array(candles.length).fill(0);
     let HistogramBuffer = new Array(candles.length).fill(0);
@@ -27,12 +27,15 @@
                                 + alpha_1*Number(SignalLineBuffer[i+1]);
         HistogramBuffer[i] = Number(MACDLineBuffer[i]) - Number(SignalLineBuffer[i]);
         }
+        return {"main":MACDLineBuffer,"signal":SignalLineBuffer,"hist":HistogramBuffer};
+       /*
         if (returBuffer == 0)
-        return MACDLineBuffer;
-    if (returBuffer == 1)
-        return SignalLineBuffer;
-    if (returBuffer == 2)
-        return HistogramBuffer;
+          return MACDLineBuffer;
+        if (returBuffer == 1)
+          return SignalLineBuffer;
+        if (returBuffer == 2)
+          return HistogramBuffer;
+        */
     }
 
 

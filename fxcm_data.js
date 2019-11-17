@@ -9,9 +9,8 @@ var store = require('./repository').store
 var conn = require('./fxcm_connect');
 let storeKey = require('./repository').storeKey;
 
-module.exports.sleep = (milliseconds) => {
-    return new Promise(resolve => setTimeout(resolve, milliseconds))
-  }
+var utils = require('./utils');
+
 module.exports.subscibe = async () => {
 	var callback = (statusCode, requestID, data,err,indx,socket) => {
 		if (statusCode === 200 && data && data != '') {
@@ -67,12 +66,12 @@ module.exports.subscibe = async () => {
         if (typeof action === 'undefined')
         {
             conn.authenticate('{ "method":"POST", "resource":"/subscribe", "params": { "pairs":' + pairs + '}}', callback );
-            await this.sleep(2000);
+            await utils.sleep(2000);
         }else if (action == "0")
         {	// something went wrong we will try again
             await conn.authenticate('{ "method":"POST", "resource":"/unsubscribe", "params": { "pairs":' + pairs + '}}');
             store.delete('subscribe');
-            await this.sleep(2000);
+            await utils.sleep(2000);
             this.subscibe();
         }  
     }

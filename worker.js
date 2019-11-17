@@ -3,6 +3,7 @@ let fs = require('fs');
 let candles = require('./fxcm_data');
 let storeKey = require('./repository').storeKey;
 var cron = require('node-cron');
+let utils = require('./utils');
 
 async function updateCandles  (){
     let trading = rep.store.get(storeKey.trading);
@@ -13,10 +14,10 @@ async function updateCandles  (){
    
     for (let i = 0;i < trading.length;i++)
     {
-        await candles.loadCandles(i);
+        await candles.loadCandles(i,rep.candlesCount);
     }
     candles.subscibe();
-    await candles.sleep(5000);
+    await utils.sleep(5000);
    
 }
 
