@@ -32,7 +32,7 @@ module.exports.authenticate = async (command,callback,indx=0) =>{
 	try{
 		store.config.token = require('fs').readFileSync('token.txt').toString();
 		store.config.token = store.config.token.split(/\r?\n/)[0]; // need only first line
-		console.log(" ######## TOLEN [" + store.config.token + '] #########' );
+		console.log(" ######## TOLEN [" + store.config.token + '][' +command+'] #########' );
 		 socket = io(store.config.trading_api_proto + '://' + store.config.trading_api_host + ':' + store.config.trading_api_port, 
 		{
 			

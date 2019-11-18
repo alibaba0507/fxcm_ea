@@ -8,8 +8,7 @@
  * Calculate MACD
  * @returns based on @param returBuffer = 0 LineBiffer , 1 = SignalBuffer , 3 = HistogramBuffer
  */
- module.exports.macd = async (candles,FastMAPeriod = 12,SlowMAPeriod = 26,SignalMAPeriod = 9
-    ,returBuffer = 0)=>{
+ module.exports.macd = async (candles,FastMAPeriod = 12,SlowMAPeriod = 26,SignalMAPeriod = 9)=>{
     let pos=candles.length-SlowMAPeriod;
     let SignalLineBuffer = new Array(candles.length).fill(0);
     let MACDLineBuffer  = new Array(candles.length).fill(0);

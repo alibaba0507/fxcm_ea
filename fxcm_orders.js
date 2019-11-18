@@ -11,7 +11,7 @@ module.exports.OpenPositionListener = async (update) =>{
     if (!jsonData.tradeId || jsonData.isTotal == true){return;}
     //console.log('  UPDATE OPEN POSSITIONS ',jsonData);
     let store_open_pos = store.get(rep.storeKey.open_possitions);
-    if (Array.isArray(JSON.parse(store_open_pos)))
+    if (store_open_pos && Array.isArray(JSON.parse(store_open_pos)))
     {
         store_open_pos = JSON.parse(store_open_pos);
         let pos = store_open_pos.find((e)=>{return (jsonData.tradeId && e.tradeId === jsonData.tradeId);});
@@ -19,6 +19,7 @@ module.exports.OpenPositionListener = async (update) =>{
        
         if (pos)
         {
+            console.log("///%%%%%%%%%%%%%%   #$$##$$$ ",pos);
             if (pos.grossPL != jsonData.grossPL)
             {
             //	console.log('>>>>>>>> OPEN POS has Canged[' + pos.currency + '] [' 
@@ -34,18 +35,40 @@ module.exports.OpenPositionListener = async (update) =>{
         else
         {
            // let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["Offer","OpenPosition","ClosedPosition","Order","Account", "Summary"] } }'
-            let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["OpenPosition"] } }'
+          /*  let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["OpenPosition"] } }'
             let open_pos = await conn.authenticate(cmd);
             if (open_pos.data )
             {
                 var jsonData = JSON.parse(open_pos.data);
                 store.store.set(store.storeKey.open_possitions,JSON.stringify (jsonData.open_positions)); 
             }
+            */
+            await this.subscibeOpenPosition(true);
+            await utils.sleep(500);
+            await this.updateOpenPositions();
+            await utils.sleep(500);
+            this.subscibeOpenPosition();
         }
+    }else
+    {
+        /*
+        let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["OpenPosition"] } }'
+        let open_pos = await conn.authenticate(cmd);
+        if (open_pos.data )
+        {
+            var jsonData = JSON.parse(open_pos.data);
+            store.store.set(store.storeKey.open_possitions,JSON.stringify (jsonData.open_positions)); 
+        }
+        */
+        await this.subscibeOpenPosition(true);
+        await utils.sleep(500);
+        await this.updateOpenPositions();
+        await utils.sleep(500);
+        this.subscibeOpenPosition();
     }
   }catch (e)
   {
-    throw new Error("Error OpenPosition[" + e + "]");
+   console.log("Error OpenPosition[" + e.stack + "]");
   }
 }
 
@@ -80,7 +103,7 @@ module.exports.ClosedPositionListener = async (update) =>{
   }
 
 
-module.exports.subscibeOpenPosition = async () =>{
+module.exports.subscibeOpenPosition = async (unsubscribe = false) =>{
 	var callback = (statusCode, requestID, data,err,indx,socket) => {
         try{
             if (statusCode === 200) {
@@ -109,16 +132,17 @@ module.exports.subscibeOpenPosition = async () =>{
         }
     };    
     let action = store.get('subscibeOpenPosition');
-    if (typeof action === 'undefined')
+    if (typeof action === 'undefined' || action == null)
     {
         conn.authenticate('{ "method":"POST", "resource":"/trading/subscribe", "params": { "models":"OpenPosition" } }', callback );
         await utils.sleep(2000);
-    }else if (action == "0")
+    }else if (action == "0" || unsubscribe)
     {
         await conn.authenticate('{ "method":"POST", "resource":"/trading/unsubscribe", "params": { "models":"OpenPosition" } }' );
         store.delete('subscibeOpenPosition');
-        await utils.sleep(2000);
-        this.subscibeOpenPosition();
+        await utils.sleep(15000);
+        if (!unsubscribe)
+            this.subscibeOpenPosition();
     }
 }
 
@@ -153,7 +177,7 @@ module.exports.subscibeClosedPosition = async () =>{
         }
     };    
     let action = store.get('subscibeClosedPosition');
-    if (typeof action === 'undefined')
+    if (typeof action === 'undefined'  || action == null)
     {
         conn.authenticate('{ "method":"POST", "resource":"/trading/subscribe", "params": { "models":"ClosedPosition" } }', callback );
         await utils.sleep(2000);
@@ -167,6 +191,17 @@ module.exports.subscibeClosedPosition = async () =>{
 }
 
 
+module.exports.updateOpenPositions = async () =>{
+    let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["OpenPosition"] } }'
+    let open_pos = await conn.authenticate(cmd);
+    if (open_pos.data )
+    {
+        var jsonData = JSON.parse(open_pos.data);
+        store.set(rep.storeKey.open_possitions,JSON.stringify (jsonData.open_positions)); 
+    }
+    console.log(" >>>>>>>> POSITOPNS ",open_pos.data);
+    await utils.sleep(500);
+}
 module.exports.closeOrder = async (order) =>{
     if (!order || !order.amountK || !order.tradeId){return;}
     if ( Number(order.amountK) < 1){order.amountK *= 100;}

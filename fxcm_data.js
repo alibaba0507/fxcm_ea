@@ -67,7 +67,7 @@ module.exports.subscibe = async (unsubscribe = false) => {
         {
             conn.authenticate('{ "method":"POST", "resource":"/subscribe", "params": { "pairs":' + pairs + '}}', callback );
             await utils.sleep(2000);
-        }else if (action == "0" || unsubscribe)
+        }else if (action == "0" || (unsubscribe && action))
         {	// something went wrong we will try again
             await conn.authenticate('{ "method":"POST", "resource":"/unsubscribe", "params": { "pairs":' + pairs + '}}');
             store.delete('subscribe');
@@ -133,7 +133,7 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
                 let action = store.get('subscribe');
                 if (action)
                   await this.subscibe(true);
-                  
+
                 let result = await conn.authenticate(cmd);
                 console.log(">>>>> AFTER AUTHENTICATE [" + result.statusCode + "] socket ["
                  + result.id 
@@ -217,7 +217,8 @@ module.exports.priceUpdate = async (update) => {
 			 {candles[0][4] = jsonData.Rates[0]}
 			 if (Number(candles[0][8]) > Number(jsonData.Rates[1]))
 			 {candles[0][8] = jsonData.Rates[1]}
-			 store.set(jsonData.Symbol.toString(),JSON.stringify(candles));
+       store.set(jsonData.Symbol.toString(),JSON.stringify(candles));
+       //console.log(" @@@@@@@@ UPDATE CANDLES ",candles[0]);
 		}
 		/*if (candles)
 		{

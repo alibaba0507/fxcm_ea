@@ -4,6 +4,7 @@ let candles = require('./fxcm_data');
 let storeKey = require('./repository').storeKey;
 var cron = require('node-cron');
 let utils = require('./utils');
+let ords = require('./fxcm_orders');
 
 async function updateCandles  (){
     let trading = rep.store.get(storeKey.trading);
@@ -12,14 +13,20 @@ async function updateCandles  (){
     //let loadPairs = store.get(rep.storeKey.trading);
     //loadPairs = JSON.parse(loadPairs);
    
+   
     for (let i = 0;i < trading.length;i++)
     {
         await candles.loadCandles(i,rep.candlesCount);
         await utils.sleep(500);
     }
     await utils.sleep(5000);
+    
     console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO PRICE &&&&&&& ");
     candles.subscibe();
+    //await ords.updateOpenPositions();
+    //await utils.sleep(5000);
+    //ords.subscibeOpenPosition();
+
     await utils.sleep(5000);
    
 }
