@@ -16,7 +16,7 @@ async function updateCandles  (){
     {
         await candles.loadCandles(i,rep.candlesCount);
     }
-    candles.subscibe();
+    //candles.subscibe();
     await utils.sleep(5000);
    
 }

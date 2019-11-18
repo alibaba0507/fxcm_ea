@@ -89,11 +89,12 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
         if (loadPairs && indx < JSON.parse(loadPairs).length) 
         {
             loadPairs = JSON.parse(loadPairs);
-            //console.log(' >>>>>>>> loadHistCandles LOADED PAIRS >>>>',loadPairs);
+            
             let candles = store.get(loadPairs[indx].pair);
+            console.log(' >>>>>>>> loadHistCandles LOADED PAIRS >>>>',candles);
             if (typeof candles === 'undefined')
             {
-               candles = []; // intilize it so we can fill it with array
+               candles = "[]"; // intilize it so we can fill it with array
               //return {"eer":"No candles for pair [" + loadPairs[indx].pair+"]"};
             }
             jsonCandles = JSON.parse(candles);
@@ -128,17 +129,17 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
                 let cmd = '{ "method":"GET", "resource":"/candles/' + loadPairs[indx].id + '/m5", "params": { "num":' + resultInMinutes + ' } }'
                 console.log('>>>>> SENDING ', cmd);
                 let result = await conn.authenticate(cmd);
+                console.log(">>>>> AFTER AUTHENTICATE ",result);
                 if (typeof result.error === 'undefined' && result.data)
                 {
                    await updateCandles(result.data, jsonCandles, histCandles, loadPairs[indx].pair);
                 }
               }
-        }else{
-            res.err = "Invalid index prameter[" + indx + "] or pairs is null";
         }
     }catch (e)
     {
       res.err = e;
+      console.log(e);
     }finally{
         return res;
     }

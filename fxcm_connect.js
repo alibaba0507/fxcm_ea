@@ -28,53 +28,103 @@ var request_headers = {
  * @param {*} indx 
  */
 module.exports.authenticate = async (command,callback,indx=0) =>{
-    store.config.token = require('fs').readFileSync('token.txt').toString();
-	store.config.token = store.config.token.split(/\r?\n/)[0]; // need only first line
-    console.log(" ######## TOLEN [" + store.config.token + '] #########' );
-    let socket = io(store.config.trading_api_proto + '://' + store.config.trading_api_host + ':' + store.config.trading_api_port, 
+	let socket;
+	try{
+		store.config.token = require('fs').readFileSync('token.txt').toString();
+		store.config.token = store.config.token.split(/\r?\n/)[0]; // need only first line
+		console.log(" ######## TOLEN [" + store.config.token + '] #########' );
+		 socket = io(store.config.trading_api_proto + '://' + store.config.trading_api_host + ':' + store.config.trading_api_port, 
+		{
+			
+			query: querystring.stringify({
+					access_token: store.config.token
+				})
+		});
+		if (typeof callback === 'undefined')
+		{
+			//callback = (statusCode,reqId,data,err,indx)=>{
+				//		return {"statusCode":statusCode,"reqId":reqId,"data":data,"error":err,"id":socket.id,"soket":socket};
+			//		};
+			return await socketProccess(command , socket,indx);
+		}
+		// fired when socket.io connects with no errors
+		socket.on('connect', () => {
+			console.log('Socket.IO session has been opened: ', socket.id);
+			console.log('@@@@@@@ OPEN SOCKET ',command);
+			request_headers.Authorization = 'Bearer ' + socket.id + store.config.token;
+			processData(command,callback,indx,socket);
+		});
+		
+		// fired when socket.io cannot connect (network errors)
+		socket.on('connect_error', (error) => {
+			console.log('Socket.IO session connect error: ', error);
+			console.log('@@@@@@@ SOCKET ERROR ',command);
+			//mail('Fxcm Alert Socket IO Error',error)
+			callback(0,0,'',error);
+
+		});
+		// fired when socket.io cannot connect (login errors)
+		socket.on('error', (error) => {
+			console.log('Socket.IO session error: ', error);
+			console.log('@@@@@@@ SOCKET ERROR ',command);
+			callback(0,0,'',error);
+		});
+		// fired when socket.io disconnects from the server
+		socket.on('disconnect', () => {
+			console.log('Socket disconnected, terminating client.');
+			console.log('@@@@@@@ SOCKET DISCONECT ',command);
+			//process.exit(-1);
+			callback(0,0,'','Socket disconnected, terminating client');
+		});
+	}catch (e)
 	{
-		  
-	    query: querystring.stringify({
-				access_token: store.config.token
-			})
-    });
-    if (typeof callback === 'undefined')
-    {
-        callback = (statusCode,reqId,data,err,indx)=>{
-			return {"statusCode":statusCode,"reqId":reqId,"data":data,"error":err,"id":socket.id,"soket":socket};
-        };
-    }
-    // fired when socket.io connects with no errors
+		return {"error":err,"id":socket.id,"soket":socket};
+	}
+
+}
+
+
+async function socketProccess(command , socket,indx)
+{
+  return new Promise((resolve, reject) => {
 	socket.on('connect', () => {
 		console.log('Socket.IO session has been opened: ', socket.id);
-		console.log('@@@@@@@ OPEN SOCKET ',command);
+		console.log('@@@@@@@ OPEN AWAIT SOCKET ',command);
 		request_headers.Authorization = 'Bearer ' + socket.id + store.config.token;
-		processData(command,callback,indx,socket);
-    });
-    
-    // fired when socket.io cannot connect (network errors)
+		processData(command,(statusCode,reqId,data,err,indx)=>{
+			resolve( {"statusCode":statusCode,"reqId":reqId
+					,"data":data,"error":err
+					,"id":socket.id,"soket":socket});
+		},indx,socket);
+	});
+
 	socket.on('connect_error', (error) => {
 		console.log('Socket.IO session connect error: ', error);
-		console.log('@@@@@@@ SOCKET ERROR ',command);
+		console.log('@@@@@@@ SOCKET AWAIT ERROR ',command);
 		//mail('Fxcm Alert Socket IO Error',error)
-		callback(0,0,'',error);
+		resolve( {"error":error
+					,"id":socket.id,"soket":socket});
 
-    });
-    // fired when socket.io cannot connect (login errors)
+	});
+
 	socket.on('error', (error) => {
 		console.log('Socket.IO session error: ', error);
-		console.log('@@@@@@@ SOCKET ERROR ',command);
-		callback(0,0,'',error);
+		console.log('@@@@@@@ SOCKET AWAIT ERROR ',command);
+		resolve( {"error":error
+					,"id":socket.id,"soket":socket});
 	});
-	// fired when socket.io disconnects from the server
+
 	socket.on('disconnect', () => {
 		console.log('Socket disconnected, terminating client.');
 		console.log('@@@@@@@ SOCKET DISCONECT ',command);
 		//process.exit(-1);
-		callback(0,0,'','Socket disconnected, terminating client');
+		//callback(0,0,'','Socket disconnected, terminating client');
+		resolve( {"error":'Socket disconnected, terminating client'
+					,"id":socket.id,"soket":socket});
 	});
-}
 
+  });
+}
 /**
  * Use mainly to process and fileter @data argument 
  * which is command for fxcm server

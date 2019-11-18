@@ -5,7 +5,7 @@ let utils = require('./utils');
 
 let conn = require('./fxcm_connect');
 
-module.exports.OpenPosition = async (update) =>{
+module.exports.OpenPositionListener = async (update) =>{
   try{
     var jsonData = JSON.parse(update);
     if (!jsonData.tradeId || jsonData.isTotal == true){return;}
@@ -51,7 +51,7 @@ module.exports.OpenPosition = async (update) =>{
 
 
 
-module.exports.ClosedPosition = async (update) =>{
+module.exports.ClosedPositionListener = async (update) =>{
     try{
       var jsonData = JSON.parse(update);
       if (!jsonData.tradeId || jsonData.isTotal == true){return;}
@@ -96,7 +96,7 @@ module.exports.subscibeOpenPosition = async () =>{
                     
                     socket.on('OpenPosition',(update)=>{
                         //['Offer', 'Account', 'Order', 'OpenPosition', 'ClosedPosition', 'Summary', 'Properties'];
-                        this.OpenPosition(update);
+                        this.OpenPositionListener(update);
                         
                     });
                 }
@@ -140,7 +140,7 @@ module.exports.subscibeClosedPosition = async () =>{
                     
                     socket.on('ClosedPosition',(update)=>{
                         //['Offer', 'Account', 'Order', 'OpenPosition', 'ClosedPosition', 'Summary', 'Properties'];
-                        this.ClosedPosition(update);;
+                        this.ClosedPositionListener(update);
                         
                     });
                 }
@@ -167,4 +167,77 @@ module.exports.subscibeClosedPosition = async () =>{
 }
 
 
+module.exports.closeOrder = async (order) =>{
+    if (!order || !order.amountK || !order.tradeId){return;}
+    if ( Number(order.amountK) < 1){order.amountK *= 100;}
+    let cmd = '{ "method":"POST", "resource":"/trading/close_trade",'
+    + '"params": { "amount":' + order.amountK 
+    + ', "time_in_force":"GTC",'
+    +  '"trade_id":"' + Number(order.tradeId)
+     + '" } }';
+     let ord_data = await conn.authenticate(cmd);
+     // if succesfull this will trigger ClosedPositionListener () 
+     // and will update Orders cashed table ...
+     if (ord_data.data)
+     {
+         console.log(">>>>>>> AFTER CLOSING ORDER [" + order.tradeId + "]");
+         console.log(ord_data);
+     }
+     return ord_data;
+} 
+
+
+module.exports.openOrder = async (pair,isBuy,lots) =>{
+    if (Number(lots) <= 0)
+    {
+        console.log(">>>>>> openOrder[" +pair + "," + isBuy + "," + lots + "] Lots must be grater then zerro");
+        return;
+    }
+    let cmd = '{ "method":"POST", "resource":"/trading/open_trade",'
+            +' "params": { "account_id":"' + rep.config.fxcm_acc   + '"' +
+              ', "symbol":"' + pair + '"' +
+               ', "is_buy":' + isBuy + 
+               ', "amount":' + lots + 
+               ', "time_in_force":"FOK" } }';
+    
+     let ord_data = await conn.authenticate(cmd);
+     if (ord_data.data)
+     {
+         console.log(">>>>>>> AFTER OPEN ORDER [" + (ord_data.data.executed ? "SUCCESS":"FAIL") + "]");
+         console.log(ord_data);
+     }
+     return ord_data;
+}
+
+module.exports.openPendingPossition = async (pair,priceAt,isBuy,lots) =>{
+    let cmd = ' { "method":"POST", "resource":"/trading/create_entry_order",'
+    +' "params": { "account_id":' + rep.config.fxcm_acc  
+     + ', "symbol":' + pair 
+     + ', "is_buy":' + isBuy 
+     + ', "rate":' + Number(priceAt) 
+     + ', "amount":' + Number(lots) + ' } }';
+     let ord_data = await conn.authenticate(cmd);
+     if (ord_data.data)
+     {
+         console.log(">>>>>>> AFTER OPEN PENDING POSITION [" + (ord_data.data.executed ? "SUCCESS":"FAIL") + "]");
+         console.log(ord_data);
+     }
+     return ord_data;
+}
+
+/**
+ * @param orderId - this is  id of pending order , DO NOT mix it with
+ *   tradeId which is id of open Order 
+ * */ 
+module.exports.deletePendingPossition = async (orderId) =>{
+    let cmd = '{ "method":"POST", "resource":"/trading/delete_order"'
+                +', "params": { "order_id":"' + ordersToclose[i].orderId + '" } }';
+     let ord_data = await conn.authenticate(cmd);
+     if (ord_data.data)
+     {
+         console.log(">>>>>>> AFTER DELETE PENDING POSITION [" + (ord_data.data.executed ? "SUCCESS":"FAIL") + "]");
+         console.log(ord_data);
+     }
+     return ord_data;
+}
 
