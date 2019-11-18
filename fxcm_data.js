@@ -11,7 +11,7 @@ let storeKey = require('./repository').storeKey;
 
 var utils = require('./utils');
 
-module.exports.subscibe = async () => {
+module.exports.subscibe = async (unsubscribe = false) => {
 	var callback = (statusCode, requestID, data,err,indx,socket) => {
 		if (statusCode === 200 && data && data != '') {
 			try {
@@ -63,16 +63,17 @@ module.exports.subscibe = async () => {
         let pairs = JSON.stringify(p);
         console.log(' >>>>>> PAIRS TO SUBSCRIBE >>>>> ',pairs);
         let action = store.get('subscribe');
-        if (typeof action === 'undefined')
+        if (typeof action === 'undefined' || action == null)
         {
             conn.authenticate('{ "method":"POST", "resource":"/subscribe", "params": { "pairs":' + pairs + '}}', callback );
             await utils.sleep(2000);
-        }else if (action == "0")
+        }else if (action == "0" || unsubscribe)
         {	// something went wrong we will try again
             await conn.authenticate('{ "method":"POST", "resource":"/unsubscribe", "params": { "pairs":' + pairs + '}}');
             store.delete('subscribe');
             await utils.sleep(2000);
-            this.subscibe();
+            if (!unsubscribe)
+              this.subscibe();
         }  
     }
 	
@@ -129,6 +130,10 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
               if (Number(resultInMinutes) > 0) { // retreving candles
                 let cmd = '{ "method":"GET", "resource":"/candles/' + loadPairs[indx].id + '/m5", "params": { "num":' + resultInMinutes + ' } }'
                 console.log('>>>>> SENDING ', cmd);
+                let action = store.get('subscribe');
+                if (action)
+                  await this.subscibe(true);
+                  
                 let result = await conn.authenticate(cmd);
                 console.log(">>>>> AFTER AUTHENTICATE [" + result.statusCode + "] socket ["
                  + result.id 
@@ -174,7 +179,7 @@ module.exports.priceUpdate = async (update) => {
 		{
 			//if (candles && candles.length > 0)
 			//{
-				console.log('  ++++++++ ###### @@@@@@@@ ====[' + jsonData.Symbol.toString() 
+				console.log('  ++++++++ ###### NEW CANDLE @@@@@@@@ ====[' + jsonData.Symbol.toString() 
 				+ '] [' + 
 			  	new Date(Number(jsonData.Updated)).getMinutes()
 				 	+ '][' + new Date(Number(candles[0][0])*1000).getMinutes() 

@@ -15,8 +15,11 @@ async function updateCandles  (){
     for (let i = 0;i < trading.length;i++)
     {
         await candles.loadCandles(i,rep.candlesCount);
+        await utils.sleep(500);
     }
-    //candles.subscibe();
+    await utils.sleep(5000);
+    console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO PRICE &&&&&&& ");
+    candles.subscibe();
     await utils.sleep(5000);
    
 }
