@@ -91,13 +91,14 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
             loadPairs = JSON.parse(loadPairs);
             
             let candles = store.get(loadPairs[indx].pair);
-            console.log(' >>>>>>>> loadHistCandles LOADED PAIRS >>>>',candles);
+            //console.log(' >>>>>>>> loadHistCandles LOADED PAIRS >>>>',candles);
             if (typeof candles === 'undefined')
             {
                candles = "[]"; // intilize it so we can fill it with array
               //return {"eer":"No candles for pair [" + loadPairs[indx].pair+"]"};
             }
             jsonCandles = JSON.parse(candles);
+            console.log(' >>>>>>>> loadHistCandles LOADED Count [' + jsonCandles.length  +"]>>>>>>");
             jsonCandles.sort((a, b) => {
                 return (b[0] - a[0]); // sort decending by time where newest time is first
             });
@@ -129,8 +130,10 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
                 let cmd = '{ "method":"GET", "resource":"/candles/' + loadPairs[indx].id + '/m5", "params": { "num":' + resultInMinutes + ' } }'
                 console.log('>>>>> SENDING ', cmd);
                 let result = await conn.authenticate(cmd);
-                console.log(">>>>> AFTER AUTHENTICATE ",result);
-                if (typeof result.error === 'undefined' && result.data)
+                console.log(">>>>> AFTER AUTHENTICATE [" + result.statusCode + "] socket ["
+                 + result.id 
+                 + "] error [" + result.error + "]date len [" + result.data.length  +"]>>>>>");
+                if (!result.error && result.data)
                 {
                    await updateCandles(result.data, jsonCandles, histCandles, loadPairs[indx].pair);
                 }
