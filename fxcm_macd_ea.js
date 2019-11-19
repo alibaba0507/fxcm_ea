@@ -5,7 +5,7 @@ let ords = require('./fxcm_orders');
 
 
 module.exports.updateOrders = async ()=>{
-  let trading = rep.store.get(storeKey.trading);
+  let trading = rep.store.get(rep.storeKey.trading);
   loadPairs = JSON.parse(trading);
   console.log(loadPairs);
   let arraySig = [];
@@ -14,16 +14,20 @@ module.exports.updateOrders = async ()=>{
     let candles = rep.store.get(loadPairs[i].pair);
     candles = JSON.parse(candles);
     let s = await this.macd_siganal(candles,500);
-    arraySig.push({"pair":loadPairs[i].pair,s});
+    arraySig.push({"pair":loadPairs[i].pair,"macd":s});
   }
   if (arraySig.length > 0)
   {
     await ords.updateOpenPositions();// collect all the open orders
-    let openOrders = rep.store.get(rep.storeKey.open_possitions);
-    if (openOrders) 
+    for (let i = 0;i < arraySig.length;i++)
     {
-      openOrders = JSON.parse(openOrders);
-      
+      if (arraySig[i].macd.bias == 1)
+      { // we hava buy signal
+        if (arraySig[1].macd.closeOrder == 1)
+        {
+          
+        }
+      }
     }
   }
 
@@ -75,11 +79,10 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
           res.closeOrder = 0;
            return res;
         }else 
-         if (((Number(res.macd.main[1])  < 0 && Number(res.macd.main[1])*(-0.62) > Number(res.bottom_macd)) 
-              || Number(res.macd.main[1]) > 0) 
+         if ( Number(res.macd.main[1]) > Number(res.bottom_macd)*(-0.62) 
           && close < open && hi > Number(ma[0]) && low < Number(ma[0]))
         {
-          res.closeOrder = 0;
+          res.openOrder = 0;
            return res;
         }
   }
