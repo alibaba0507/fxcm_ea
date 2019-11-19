@@ -25,19 +25,25 @@ module.exports.orderLots = async (pair)=>{
 }
 module.exports.lastOpenOrder = async (pair,isBuy = false) =>
 {
-    let acc_open_ords = store.get(storeKey.open_possitions);
-    if (!acc_open_ords) {return {"pair":pair,"error":"No lastOrders for[" + pair + "]"};}
-    acc_open_ords = JSON.parse(acc_open_ords);
-    let ords_to_close = utils.sortAccOrders(acc_open_ords
-        , pair, (isBuy === true) ? 1 : 0, null, true);
-    let candles = store.get(pair);
-    candles = JSON.parse(candles);
-    if (ords_to_close.length > 0) {
-        let c = Number(candles[0][candleParams.BidClose]);
-        let diff = Number(ords_to_close[0].open);
-        diff = (isBuy == true) ? c - diff : diff - c;
-        return {"pair":pair,"ord":ords_to_close, "pips":diff};
-    }
+    try{
+        let acc_open_ords = store.get(rep.storeKey.open_possitions);
+        if (!acc_open_ords) {return {"pair":pair,"error":"No lastOrders for[" + pair + "]"};}
+        acc_open_ords = JSON.parse(acc_open_ords);
+        let ords_to_close = await utils.sortAccOrders(acc_open_ords
+            , pair, (isBuy === true) ? 1 : 0, null,true);
+        console.log(">>>>>> ["  +pair + "] openORDS[" + acc_open_ords.length + "] after Sort [" + ords_to_close.length + "]>>>");
+        let candles = store.get(pair);
+        candles = JSON.parse(candles);
+        if (ords_to_close.length > 0) {
+            let c = Number(candles[0][rep.candleParams.BidClose]);
+            let diff = Number(ords_to_close[0].open);
+            diff = (isBuy == true) ? c - diff : diff - c;
+            return {"pair":pair,"ord":ords_to_close[0], "pips":diff};
+        }
+  }catch (e)
+  {
+      console.log(e.stack);
+  }
 }
 module.exports.OpenPositionListener = async (update) =>{
   try{
@@ -233,7 +239,7 @@ module.exports.updateOpenPositions = async () =>{
         var jsonData = JSON.parse(open_pos.data);
         store.set(rep.storeKey.open_possitions,JSON.stringify (jsonData.open_positions)); 
     }
-    console.log(" >>>>>>>> POSITOPNS ",open_pos.data);
+    //console.log(" >>>>>>>> POSITOPNS ",open_pos.data);
     await utils.sleep(500);
 }
 module.exports.closeOrder = async (order) =>{

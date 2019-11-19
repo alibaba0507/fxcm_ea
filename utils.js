@@ -15,6 +15,7 @@ module.exports.sleep = (milliseconds) => {
  */
   module.exports.sortAccOrders = async (acc_arr,pair,orderByIsBuy,orderByProfitPerLotBiggerThan,sortByOpenTime,sortByCloseTime)=>
   {
+    try{
     let filterArray = new Array();
   orderByIsBuy = 
       (orderByIsBuy && orderByIsBuy == true)?1
@@ -29,9 +30,10 @@ module.exports.sleep = (milliseconds) => {
       //console.log('Order By ',(orderByIsBuy == 1));
       filterArray = filterArray.filter((e)=>{return ((orderByIsBuy == 1)?(e.isBuy === true):(e.isBuy === false));})
     }
+    console.log(" ORDER COUNT PER PAIR [" + filterArray.length + "]>>>");
     if (sortByOpenTime == true)
     {
-      //console.log('>>>>> SORT BY OPEN Time >>>>>');
+      console.log('>>>>> SORT BY OPEN Time >>>>>');
       filterArray.sort((a,b)=>{
       //  console.log('+++++++ [' + Number(a.time) + '] > [' + Number(b.time) + '] +++++++')
         return Number(b.time) - Number(a.time) 
@@ -66,6 +68,10 @@ module.exports.sleep = (milliseconds) => {
     } 
   }// end if(pair)
   return filterArray;
+  }catch (e)
+  {
+    console.log(e.stack);
+  }
   }
   module.exports.convertCandlesByTime = async (candles, time = 15)=>{
     let tfCandles = [];

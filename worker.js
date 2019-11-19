@@ -11,10 +11,10 @@ async function updateCandles  (){
     let trading = rep.store.get(storeKey.trading);
     if (!trading) { return; }
     trading = JSON.parse(trading);
-    //let loadPairs = store.get(rep.storeKey.trading);
-    //loadPairs = JSON.parse(loadPairs);
+    let loadPairs = rep.store.get(rep.storeKey.trading);
+    loadPairs = JSON.parse(loadPairs);
    
-   /*
+   
     for (let i = 0;i < trading.length;i++)
     {
         await candles.loadCandles(i,rep.candlesCount);
@@ -24,13 +24,26 @@ async function updateCandles  (){
     
     console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO PRICE &&&&&&& ");
     candles.subscibe();
-    //await ords.updateOpenPositions();
+    await ords.updateOpenPositions();
     //await utils.sleep(5000);
     //ords.subscibeOpenPosition();
+   // let trading = rep.store.get(rep.storeKey.trading);
+  //  loadPairs = JSON.parse(trading);
+    for (let i = 0;i < loadPairs.length;i++)
+    {
+      //let candles = rep.store.get(loadPairs[i].pair);
+      //candles = JSON.parse(candles);
+      let ordLots = await ords.orderLots(loadPairs[i].pair);
+      console.log(" >>>>>> ORDER LOTS [" + loadPairs[i].pair + "]",ordLots) ;
+      let lastOrdBuy = await ords.lastOpenOrder(loadPairs[i].pair,true);
+      console.log(" >>>>>> LAST BUY ORDER [" + loadPairs[i].pair + "]",lastOrdBuy) ;
+      let lastOrdSell = await ords.lastOpenOrder(loadPairs[i].pair,false);
+      console.log(" >>>>>> LAST SELL ORDER [" + loadPairs[i].pair + "]",lastOrdSell) ;
+    }
     await utils.sleep(2000);
     console.log(" >>>>>>>>>> BEFORE MACD >>>>>>>>");
-    await macd();
-    */
+    //await macd();
+    
    //rep.mail('FXCM Test mail',"<b> This is is a test");
 }
 
@@ -78,14 +91,15 @@ async function updateSotreParams () {
       console.log(' >>>> ERROR GET updateSotreParams ', e);
     }
   }
-
+  
+  /*
   var task = cron.schedule('* * * * *', () => {
     let savedPairs = fs.readFileSync('pairs.txt').toString();
     console.log(' >>>>> PING SERVER EVERY 1 MIN WORKER ....>>>>>');
      //updateCandles();
     if ((new Date().getMinutes() % 5) == 0) { updateCandles(); }
   });
-
+*/
   // Load pair parameters
   
    updateSotreParams();
