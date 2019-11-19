@@ -1,9 +1,64 @@
+let rep = require('./repository');
+
+let utils = require('./utils');
+
 /**
  * Will calculate some of indicators , for 
  * given time frame.
  */
 
 
+ module.exports.calcMACDRange = async (candles, cnt,startFrom = 0, tf =5) =>{
+  if (tf != 5)
+   candles = await utils.convertCandlesByTime(candles,tf); 
+  let macd = await this.macd(candles);
+  let avrg_max = 0;
+  let avrg_min = 0;
+  let min_cnt = 0;
+  let max_cnt = 0;
+  let max_pr = 0;
+  let min_pr =0;
+  for (let i = (cnt+startFrom);i > startFrom;i--)
+  {
+    if (Number(macd.main[i]) > 0)
+    {
+      avrg_max += Number(macd.main[i]);
+      max_cnt ++;
+      max_pr += Number(candles[i][rep.candleParams.BidClose]);
+    }
+    if (Number(macd.main[i]) < 0)
+    {
+      avrg_min += Number(macd.main[i])*(-1);
+      min_cnt ++;
+      min_pr += Number(candles[i][rep.candleParams.AskClose]);
+    }
+  }// end for
+  let res = {};
+  if (max_cnt>0)
+  {
+    res.top_macd = (avrg_max / max_cnt);
+    max_pr /= max_cnt;
+  }
+  if (min_cnt > 0)
+  {
+   res.bottom_macd = (avrg_min/min_cnt);
+   min_pr /= min_cnt;
+  }
+  if (min_pr > 0 && max_pr > 0)
+   res.price_dist = Math.max(min_pr,max_pr) - Math.min(min_pr,max_pr);
+  
+  res.bias = -1;
+   if (res.top_macd != 0 && res.bottom_macd != 0)
+   {
+    if(res.top_macd > res.bottom_macd && (res.bottom_macd/res.top_macd) < 0.8)
+      res.bias = 1;
+    if(res.top_macd < res.bottom_macd && (res.top_macd/res.bottom_macd) < 0.8)
+    res.bias = 0; 
+   }
+
+   return res;
+} 
+ 
  /**
  * Calculate MACD
  * @returns based on @param returBuffer = 0 LineBiffer , 1 = SignalBuffer , 3 = HistogramBuffer
@@ -18,8 +73,8 @@
     for( let i=pos; i>=0; i--)
         {
         //  MACDLineBuffer[i] = iMA(NULL,0,FastMAPeriod,0,MODE_EMA,PRICE_CLOSE,i) - iMA(NULL,0,SlowMAPeriod,0,MODE_EMA,PRICE_CLOSE,i);
-        let emaFast =  ema(candles,FastMAPeriod);
-        let emaSlow =  ema(candles,SlowMAPeriod);
+        let emaFast =  await ema(candles,FastMAPeriod);
+        let emaSlow =  await ema(candles,SlowMAPeriod);
         MACDLineBuffer[i] = Number(emaFast[i])
                         -  Number(emaSlow[i]);
         SignalLineBuffer[i] = alpha*Number(MACDLineBuffer[i])  
@@ -96,7 +151,7 @@ module.exports.ma = async (candles,ma = 200) =>{
      * @param {*} candles - Array of candles  
      * @param {*} ma - Moving Avereges period
      */
-function ema (candles,ma = 200) 
+async function ema (candles,ma = 200) 
 {  
    let pr=2.0/(Number(ma)+1);
     let sum=0;
