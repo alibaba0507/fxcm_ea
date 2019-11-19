@@ -4,7 +4,69 @@ module.exports.sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
   }
 
-
+/**
+ * This function will order and sort Account 
+ * orders
+ * @param {*} acc_arr 
+ * @param {*} pair 
+ * @param {*} orderByIsBuy 
+ * @param {*} orderByProfitPerLotBiggerThan 
+ * @param {*} sortByOpenTime 
+ */
+  module.exports.sortAccOrders = async (acc_arr,pair,orderByIsBuy,orderByProfitPerLotBiggerThan,sortByOpenTime,sortByCloseTime)=>
+  {
+    let filterArray = new Array();
+  orderByIsBuy = 
+      (orderByIsBuy && orderByIsBuy == true)?1
+      : (orderByIsBuy && orderByIsBuy == false)?0:orderByIsBuy;
+  if (pair)
+  {
+    // filter by currency
+    filterArray = acc_arr.filter((e)=>{ return (e.currency == pair)})
+    if ((orderByIsBuy == 1 || orderByIsBuy == 0))
+    {
+      //console.log('Order By ',orderByIsBuy);
+      //console.log('Order By ',(orderByIsBuy == 1));
+      filterArray = filterArray.filter((e)=>{return ((orderByIsBuy == 1)?(e.isBuy === true):(e.isBuy === false));})
+    }
+    if (sortByOpenTime == true)
+    {
+      //console.log('>>>>> SORT BY OPEN Time >>>>>');
+      filterArray.sort((a,b)=>{
+      //  console.log('+++++++ [' + Number(a.time) + '] > [' + Number(b.time) + '] +++++++')
+        return Number(b.time) - Number(a.time) 
+      });
+    }
+    if (sortByCloseTime == true)
+    {
+      //console.log('>>>>> SORT BY OPEN Time >>>>>');
+      filterArray.sort((a,b)=>{
+      //  console.log('+++++++ [' + Number(a.time) + '] > [' + Number(b.time) + '] +++++++')
+        return Number(b.closeTime) - Number(a.closeTime) 
+      });
+    }
+    if (orderByProfitPerLotBiggerThan  && !isNaN(orderByProfitPerLotBiggerThan))
+    {
+     // console.log('++++++++++ ORDER BY PROFIT ++++ ');
+      let copyArray = new Array();
+       //(Number(e.visiblePL)/100) > Number(orderByProfitPerLotBiggerThan))
+       let cnt = 0;
+       let canCopy = false;
+       filterArray.forEach((e)=>{
+        if (/*(cnt==0 || canCopy)
+               &&*/ (Number(e.grossPL)) >= Number(orderByProfitPerLotBiggerThan))
+        {
+          canCopy = true;
+          copyArray.push(e);
+       //   console.log('++++++++++ ORDER BY PROFIT ++++ [' + e.grossPL + '] >>>>>>');
+        }
+        cnt++;
+       })
+       filterArray = copyArray;
+    } 
+  }// end if(pair)
+  return filterArray;
+  }
   module.exports.convertCandlesByTime = async (candles, time = 15)=>{
     let tfCandles = [];
     let candleIndx = [];

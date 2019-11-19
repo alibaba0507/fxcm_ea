@@ -5,6 +5,40 @@ let utils = require('./utils');
 
 let conn = require('./fxcm_connect');
 
+module.exports.orderLots = async (pair)=>{
+    let acc_open_ords = store.get(rep.storeKey.open_possitions);
+    if (!acc_open_ords) {return {"pair":pair,"error":"No lots present for[" + pair + "]"};}
+    acc_open_ords = JSON.parse(acc_open_ords);
+    let buyLots = 0;
+    let sellLots = 0;
+    for (let i =0;i < acc_open_ords.length;i++)
+    {
+        if (acc_open_ords[i].currency == pair)
+        {
+          if (acc_open_ords[i].isBuy)
+           buyLots += acc_open_ords[i].amountK;
+          else
+           sellLots += acc_open_ords[i].amountK;
+        }
+    }
+    return {"pair":pair,"buy":buyLots,"sell":sellLots};
+}
+module.exports.lastOpenOrder = async (pair,isBuy = false) =>
+{
+    let acc_open_ords = store.get(storeKey.open_possitions);
+    if (!acc_open_ords) {return {"pair":pair,"error":"No lastOrders for[" + pair + "]"};}
+    acc_open_ords = JSON.parse(acc_open_ords);
+    let ords_to_close = utils.sortAccOrders(acc_open_ords
+        , pair, (isBuy === true) ? 1 : 0, null, true);
+    let candles = store.get(pair);
+    candles = JSON.parse(candles);
+    if (ords_to_close.length > 0) {
+        let c = Number(candles[0][candleParams.BidClose]);
+        let diff = Number(ords_to_close[0].open);
+        diff = (isBuy == true) ? c - diff : diff - c;
+        return {"pair":pair,"ord":ords_to_close, "pips":diff};
+    }
+}
 module.exports.OpenPositionListener = async (update) =>{
   try{
     var jsonData = JSON.parse(update);
