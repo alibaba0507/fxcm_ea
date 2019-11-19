@@ -8,6 +8,9 @@ let utils = require('./utils');
  */
 
 
+ /**
+  * @returns {macd:(array of macd{}),top_macd,bottom_macd,price_dist,bias}
+  */
  module.exports.calcMACDRange = async (candles, cnt,startFrom = 0, tf =5) =>{
   if (tf != 5)
    candles = await utils.convertCandlesByTime(candles,tf); 
@@ -33,7 +36,7 @@ let utils = require('./utils');
       min_pr += Number(candles[i][rep.candleParams.AskClose]);
     }
   }// end for
-  let res = {};
+  let res = {"macd":macd};
   if (max_cnt>0)
   {
     res.top_macd = (avrg_max / max_cnt);

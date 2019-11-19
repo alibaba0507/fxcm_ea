@@ -31,7 +31,7 @@ async function updateCandles  (){
     console.log(" >>>>>>>>>> BEFORE MACD >>>>>>>>");
     await macd();
     */
-   rep.mail('FXCM Test mail',"<b> This is is a test");
+   //rep.mail('FXCM Test mail',"<b> This is is a test");
 }
 
 
