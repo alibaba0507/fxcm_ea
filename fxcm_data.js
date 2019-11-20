@@ -119,7 +119,7 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
                   d = new Date(Number(jsonCandles[j][0]) * 1000);
                   difference = now.getTime() - d.getTime(); // This will give difference in milliseconds
                   let res = Math.round(difference / (60000 * 5));
-                  if (res > j + 1 || res < j - 1) {
+                  if (res > j + 2 || res < j - 2) {
                     resultInMinutes = histCandles;
                     console.log(' ************** CANDLE OUT OF SYNCHRONIZATION '
                       + '[' + loadPairs[indx].pair + '] CANDLE [' + j
@@ -130,7 +130,7 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
                   }
                 }//end for (let j = 1; j < 20; j++)
               }// end if (candles.length < histCandles - 1)
-              if (Number(resultInMinutes) > 0) { // retreving candles
+              if (resultInMinutes && Number(resultInMinutes) > 0) { // retreving candles
                 let cmd = '{ "method":"GET", "resource":"/candles/' + loadPairs[indx].id + '/m5", "params": { "num":' + resultInMinutes + ' } }'
                 console.log('>>>>> SENDING ', cmd);
                 let action = store.get('subscribe');

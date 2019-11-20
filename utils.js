@@ -132,10 +132,10 @@ module.exports.sleep = (milliseconds) => {
     let tfCandles = [];
     let candleIndx = [];
     if (Array.isArray(candles)) {
-      for (var i = 0; i < candles.length; i++) {
+      for (var i = candles.length - 1; i > 0/*candles.length*/; i--) {
         let d = new Date(Number(candles[i][0]) * 1000);
        
-        if (i == 0  
+        if (i == (candles.length - 1)/*0*/  
             || d.getMinutes() == time 
               || d.getMinutes() == 0 
                 || (d.getMinutes() > time 

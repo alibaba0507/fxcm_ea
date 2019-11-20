@@ -36,7 +36,8 @@ module.exports.createOrderTemplate = async () =>{
       let ordBuy = await ords.lastOpenOrder(loadPairs[i].pair,true);
       let ordSell = await ords.lastOpenOrder(loadPairs[i].pair,false);
       templateArrays.push({"pair":loadPairs[i].pair
-          , "lots":lots,"buy":ordBuy,"sell":ordSell
+          , "bias":(s && typeof s.bias !== 'undefined' && s.bias !== null )? ( s.bias == 1?"BUY":s.bias == 0?"SELL":"NA"):"ERROR(NA)"
+          , "lotsBuy":lots.buy,"lotsSell":lots.sell,"buy":ordBuy,"sell":ordSell
               ,"macd":s})
   }
     templateArrays.sort((a,b)=>{

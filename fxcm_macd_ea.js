@@ -47,16 +47,23 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
   
   let oldTF = chooseNextTimeFrame(tf);
   let biasMacd = await indic.calcMACDRange(candles,cnt,startFrom,oldTF);
+  let count = cnt;
+  let prevTF = oldTF;
   while (Number(biasMacd.bias) == -1)
   {
-    let newTF = chooseNextTimeFrame(oldTF);
-    if (newTF == oldTF)
-     break;
-    biasMacd = await indic.calcMACDRange(candles,cnt,startFrom,newTF);
-   oldTF = newTF;
+    count += (cnt*0.5);
+    if (count + startFrom > candles.length - 1 /*|| (count / cnt) > 5*/)
+      break;
+    //oldTF = chooseNextTimeFrame(oldTF);
+    
+    biasMacd = await indic.calcMACDRange(candles,count,startFrom,oldTF);
+    //oldTF = chooseNextTimeFrame(oldTF);
+    //if (prevTF == oldTF)
+    // break;
+    //prevTF = oldTF;
   }
   let result = {};
-  result.bias = biasMacd;
+  result.bias = biasMacd.bias;
   if (Number(biasMacd.bias) == 1)
   { // buy bias
     if (Number(res.macd.main[1]) > Number(res.top_macd) * 1.32 && 
@@ -86,7 +93,7 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
            return result;
         }
   }
-  return;
+  return result;
 }
 
 async function chooseNextTimeFrame(tf)

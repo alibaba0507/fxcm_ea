@@ -32,8 +32,10 @@ app.get( '/ping', function( req, res ) {
   });
 
   app.get( '/open_orders_291267', async ( req, res )=> {
+    await require('./fxcm_orders').updateOpenPositions();
     let openPos = await templates.createOrderTemplate();
     console.log(" >>>>>> get Info ",openPos);
+    //let clientData = !{ JSON.stringify(openPos) };
     return res.render( 'index.html',{
         open_positions:openPos
     });

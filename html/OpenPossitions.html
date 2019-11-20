@@ -12,13 +12,21 @@
                  <tr>
                         <td>{{ item.pair }}</td>
                         <td>
-                                <font color="green">BUY({{ item.lots.buy }})</font>
-                                --
-                                <font color="red">SELL({{ item.lots.sell }})</font>
+                                        {{ item.bias }}
                         </td>
                         <td>
-                           {{item.buy.ord.amountK}} --- 
-                           {{item.buy.pips}}
+                                <font color="green">BUY({{ item.lotsBuy }})</font>
+                                --
+                                <font color="red">SELL({{ item.lotsSell }})</font>
+                        </td>
+                        <td>
+
+                        </td>
+                        <td>
+
+                        </td>
+                        <td>
+
                         </td>
                 </tr>
                 {% endfor %}
