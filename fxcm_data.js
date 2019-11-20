@@ -106,6 +106,9 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
             if (candles.length < histCandles - 1) {
                 resultInMinutes = (histCandles) - candles.length;
               } else {
+                
+                let uctCandle = utils.nowToUCT(Number(jsonCandles[0][0]) * 1000);
+                let uctNow = utils.nowToUCT(new Date().getTime());
                 let now = new Date();
                 let d = new Date(Number(jsonCandles[0][0]) * 1000);
                // console.log('############### LAST DATE FROM STORE ', d.toUTCString());
@@ -169,11 +172,16 @@ module.exports.priceUpdate = async (update) => {
 	
 		let now = new Date();
 		let newCandle = false;
-		newCandle =((new Date(Number(jsonData.Updated)).getMinutes() % 5) == 1);
+    newCandle =((new Date(Number(jsonData.Updated)).getMinutes() % 5) == 1);
+    /*console.log("++++++++ ######  CANDLE @@@@@@@@ ["  +  new Date(Number(jsonData.Updated)).toString()
+       + "][" + new Date(candles[0][0]*1000).toString() + "]>>>>>>")
+       */
+      
 		if (newCandle == true && candles && candles.length > 0)
 		{
 			newCandle =  (new Date(Number(jsonData.Updated)).getMinutes()
-			       != new Date(Number(candles[0][0])*1000).getMinutes());
+             != new Date(Number(candles[0][0])*1000).getMinutes());
+       
 		}
 		if (newCandle == true && candles && candles.length > 0)
 		{
@@ -181,13 +189,13 @@ module.exports.priceUpdate = async (update) => {
 			//{
 				console.log('  ++++++++ ###### NEW CANDLE @@@@@@@@ ====[' + jsonData.Symbol.toString() 
 				+ '] [' + 
-			  	new Date(Number(jsonData.Updated)).getMinutes()
+			      now.getMinutes()
 				 	+ '][' + new Date(Number(candles[0][0])*1000).getMinutes() 
 				 	+ '] CANDLES [' + candles.length + ']==========');
 			//}
 			let cndl = new Array();
 			cndl.push(Number(jsonData.Updated)/1000);
-			cndl.push(jsonData.Rates[0]);
+      cndl.push(jsonData.Rates[0]);
 			cndl.push(jsonData.Rates[0]);
 			cndl.push(jsonData.Rates[0]);
 			cndl.push(jsonData.Rates[0]);
@@ -204,7 +212,8 @@ module.exports.priceUpdate = async (update) => {
 		{
 		//	if ((now.getMinutes() % 5) != 0)
 		//	  candles[0][9] = '';
-			candles[0][0] = Number(jsonData.Updated)/1000;
+    	candles[0][0] = Number(jsonData.Updated)/1000;
+      //candles[0][0] = now.getTime()/1000;
 			candles[0][2] = jsonData.Rates[0]; // close Bid
 			candles[0][6] = jsonData.Rates[0]; // close Ask
 

@@ -23,6 +23,7 @@ module.exports.orderLots = async (pair)=>{
     }
     return {"pair":pair,"buy":buyLots,"sell":sellLots};
 }
+
 module.exports.lastOpenOrder = async (pair,isBuy = false) =>
 {
     try{
@@ -38,7 +39,14 @@ module.exports.lastOpenOrder = async (pair,isBuy = false) =>
             let c = Number(candles[0][rep.candleParams.BidClose]);
             let diff = Number(ords_to_close[0].open);
             diff = (isBuy == true) ? c - diff : diff - c;
-            return {"pair":pair,"ord":ords_to_close[0], "pips":diff};
+            let lastOrder = ords_to_close[0];
+            // Sort closest to current price
+            ords_to_close.sort((a,b)=>{
+                return Math.abs(c-Number(a.open)) - Math.abs(c-Number(b.open));
+              });
+            let closestToCurrentPrice = ords_to_close[0];
+            let clsPrDif =  (isBuy == true) ? c - Number(ords_to_close[0].open) : Number(ords_to_close[0].open) - c;
+            return {"pair":pair,"ord":lastOrder, "pips":diff,"closestOrder":closestToCurrentPrice,"closestPips":clsPrDif};
         }
   }catch (e)
   {

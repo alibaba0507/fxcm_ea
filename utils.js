@@ -1,5 +1,46 @@
 "use strict";
 
+let rep = require('./repository');
+
+
+module.exports.nowToUCT = (dateStamp)=>
+{
+  var date = new Date(); 
+  var now_utc =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+  date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+  //return new Date(now_utc);
+  if (dateStamp)
+  {
+  return {
+    iso: {
+       start: () => new Date(new Date(dateStamp).setHours(0, 0, 0, 0)).toISOString()
+       ,now: () => new Date(dateStamp).toISOString()
+       ,end: () => new Date(new Date(dateStamp).setHours(23, 59, 59, 999)).toISOString()
+      }
+      ,local: { 
+        start: () => new Date(new Date(new Date(dateStamp).setHours(0, 0, 0, 0)).toString().split('GMT')[0] + ' UTC').toISOString()
+        ,now: () => new Date(new Date(dateStamp).toString().split('GMT')[0] + ' UTC').toISOString()
+        ,end: () => new Date(new Date(new Date(dateStamp).setHours(23, 59, 59, 999)).toString().split('GMT')[0] + ' UTC').toISOString()
+      }
+    }
+  }else
+  {
+    return {
+      iso: {
+         start: () => new Date(new Date().setHours(0, 0, 0, 0)).toISOString()
+         ,now: () => new Date().toISOString()
+         ,end: () => new Date(new Date().setHours(23, 59, 59, 999)).toISOString()
+        }
+        ,local: { 
+          start: () => new Date(new Date(new Date().setHours(0, 0, 0, 0)).toString().split('GMT')[0] + ' UTC').toISOString()
+          ,now: () => new Date(new Date().toString().split('GMT')[0] + ' UTC').toISOString()
+          ,end: () => new Date(new Date(new Date().setHours(23, 59, 59, 999)).toString().split('GMT')[0] + ' UTC').toISOString()
+        }
+    }
+  }
+}
+
+
 module.exports.sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
   }
@@ -13,7 +54,7 @@ module.exports.sleep = (milliseconds) => {
  * @param {*} orderByProfitPerLotBiggerThan 
  * @param {*} sortByOpenTime 
  */
-  module.exports.sortAccOrders = async (acc_arr,pair,orderByIsBuy,orderByProfitPerLotBiggerThan,sortByOpenTime,sortByCloseTime)=>
+  module.exports.sortAccOrders = async (acc_arr,pair,orderByIsBuy,orderByProfitPerLotBiggerThan,sortByOpenTime,sortByCloseTime,sortByClosestPrice = false)=>
   {
     try{
     let filterArray = new Array();
@@ -46,6 +87,20 @@ module.exports.sleep = (milliseconds) => {
       //  console.log('+++++++ [' + Number(a.time) + '] > [' + Number(b.time) + '] +++++++')
         return Number(b.closeTime) - Number(a.closeTime) 
       });
+    }
+    if (sortByClosestPrice)
+    {
+      let copyArray = new Array();
+       //(Number(e.visiblePL)/100) > Number(orderByProfitPerLotBiggerThan))
+       let cnt = 0;
+       let canCopy = false;
+       let candles = rep.store.get(filterArray[0].currency);
+        candles = JSON.parse(candles);
+        let c = Number(candles[0][rep.candleParams.BidClose]);
+        filterArray.sort((a,b)=>{
+          return Math.abs(c-Number(a.open)) - Math.abs(c-Number(b.open));
+        });
+      
     }
     if (orderByProfitPerLotBiggerThan  && !isNaN(orderByProfitPerLotBiggerThan))
     {

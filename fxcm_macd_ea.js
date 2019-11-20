@@ -55,20 +55,20 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
     biasMacd = await indic.calcMACDRange(candles,cnt,startFrom,newTF);
    oldTF = newTF;
   }
-  let res = {};
-  res.bias = biasMacd.bias;
+  let result = {};
+  result.bias = biasMacd;
   if (Number(biasMacd.bias) == 1)
   { // buy bias
     if (Number(res.macd.main[1]) > Number(res.top_macd) * 1.32 && 
         close < open && hi > Number(ma[0]) && low < Number(ma[0]))
         {
-          res.closeOrder = 1;
-           return res;
+          result.closeOrder = 1;
+           return result;
         }else if (Number(res.macd.main[1]) < Number(res.top_macd) * 0.62 && 
           close > open && hi > Number(ma[0]) && low < Number(ma[0]))
           {
-            res.openOrder = 1;
-           return res;
+            result.openOrder = 1;
+           return result;
           } 
   }
   if (Number(biasMacd.bias) == 0)
@@ -76,14 +76,14 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
     if (Number(res.macd.main[1])  < 0 && Number(res.macd.main[1])*(-1) > Number(res.bottom_macd) * 1.32 && 
         close > open && hi > Number(ma[0]) && low < Number(ma[0]))
         {
-          res.closeOrder = 0;
-           return res;
+          result.closeOrder = 0;
+           return result;
         }else 
          if ( Number(res.macd.main[1]) > Number(res.bottom_macd)*(-0.62) 
           && close < open && hi > Number(ma[0]) && low < Number(ma[0]))
         {
-          res.openOrder = 0;
-           return res;
+          result.openOrder = 0;
+           return result;
         }
   }
   return;

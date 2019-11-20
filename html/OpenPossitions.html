@@ -1,0 +1,27 @@
+<div class="row">
+        <div class="col-sm">
+                <table border="1">
+                        <tr>
+                            <th>Pair</th><th>Trend Direction</th>
+                            <th>Lots</th>
+                            <th>Last Open Buy</th>
+                            <th>Last Open Sell</th>
+                            <th>Closest Buy</th>
+                            <td>Closest Sell</td></tr>
+                 {% for item in open_positions | sort(false, true, 'pair')  %}
+                 <tr>
+                        <td>{{ item.pair }}</td>
+                        <td>
+                                <font color="green">BUY({{ item.lots.buy }})</font>
+                                --
+                                <font color="red">SELL({{ item.lots.sell }})</font>
+                        </td>
+                        <td>
+                           {{item.buy.ord.amountK}} --- 
+                           {{item.buy.pips}}
+                        </td>
+                </tr>
+                {% endfor %}
+                </table>
+        </div>
+</div>

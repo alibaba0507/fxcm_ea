@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+        <div class="container">
+                <h2>My Trading View</h2>
+                <p>This is information of my account trades , info and strategy </p>
+                <ul class="nav nav-pills">
+                        <li><a data-toggle="pill" href="#open_possitions">Open Positions</a></li>
+                </ul>
+        </div>
+        <div class="tab-content">
+                <div id="open_possitions" class="tab-pane fade">
+                        <h3>Open Possitions</h3>
+                        {% include "./OpenPossitions.html" %}
+                </div>
+</div>
+</body>
