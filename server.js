@@ -25,6 +25,23 @@ nunjucks.configure( PATH_TO_TEMPLATES, {
     express: app
 } ) ;
 
+app.post("/update_token", async (req,res)=>{
+  try{
+   if (req.body.token)
+   {
+       // we must save token
+       //fs.writeFileSync('token.txt', req.body.token);
+       let token = req.body.token;
+       rep.config.token = token.trim();
+       await candles.subscibe(true);
+   }
+   return res.send('<b>Token has been saved');
+  }catch (e)
+  {
+      return res.send('<b>Error saving token ',e.toString());
+  }
+
+})
 
 app.get( '/ping', function( req, res ) {
     console.log(' >>>>>>> Calling Ping Server ....');

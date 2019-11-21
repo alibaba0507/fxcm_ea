@@ -1,6 +1,30 @@
 let rep = require('./repository');
 let ea = require('./fxcm_macd_ea');
 let ords = require('./fxcm_orders');
+
+module.exports.checkForEmailSignal = async () =>{
+  let trading = rep.store.get(rep.storeKey.trading);
+  loadPairs = JSON.parse(trading);
+  console.log(loadPairs);
+  let pairsToUpdate = [];
+  for (let i = 0;i < loadPairs.length;i++)
+  {
+    let candles = rep.store.get(loadPairs[i].pair);
+    candles = JSON.parse(candles);
+    let s = await ea.macd_siganal(candles,500);
+    if (s && (Object.prototype.hasOwnProperty.call(s, 'closeOrder')
+            || Object.prototype.hasOwnProperty.call(s, 'openOrder')))
+            {
+              pairsToUpdate.push({"pair":loadPairs[i].pair,"macd":s});
+            }
+  }// end for
+  if (pairsToUpdate.length > 0)
+  { // we have a winner
+    await ords.updateOpenPositions();
+    
+
+  }
+}
 /**
  *  @returns array of {
  *     "pair",
