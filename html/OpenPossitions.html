@@ -7,7 +7,7 @@
                             <th>Last Open Buy</th>
                             <th>Last Open Sell</th>
                             <th>Closest Buy</th>
-                            <td>Closest Sell</td></tr>
+                            <th>Closest Sell</th></tr>
                  {% for item in open_positions | sort(false, true, 'pair')  %}
                  <tr>
                         <td>{{ item.pair }}</td>
@@ -25,7 +25,9 @@
                                 {% else %}
                                 <font color="green">{{ item.lastBuy_pips | round(5) }}</font>
                                 {% endif %}
-                                -- L({{ item.lastBuy_lots}})
+                                -- L({{ item.lastBuy_lots}}) 
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="/close?tradeId={{ item.lastBuy_tradeId }}">X</a>
                         </td>
                         <td>
                                 {% if item.lastSell_pips < 0 %}
@@ -34,6 +36,8 @@
                                 <font color="green">{{ item.lastSell_pips | round(5) }}</font>
                                 {% endif %}
                                 -- L({{ item.lastSell_lots}})
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="/close?tradeId={{ item.lastSell_tradeId }}">X</a>
                         </td>
                         <td>
                                 {% if item.closeBuy_pips < 0 %}
@@ -42,6 +46,8 @@
                                 <font color="green">{{ item.closeBuy_pips | round(5) }}</font>
                                 {% endif %}
                                 -- L({{ item.closeBuy_lots}})
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="/close?tradeId={{ item.closeBuy_tradeId }}">X</a>
                         </td>
                         <td>
                                 {% if item.closeSell_pips < 0 %}
@@ -50,6 +56,8 @@
                                 <font color="green">{{ item.closeSell_pips | round(5) }}</font>
                                 {% endif %}
                                 -- L({{ item.closeSell_lots}})
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <a href="/close?tradeId={{ item.lastSell_tradeId }}">X</a>
                         </td>
                 </tr>
                 {% endfor %}
