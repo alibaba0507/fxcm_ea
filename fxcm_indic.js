@@ -109,6 +109,9 @@ module.exports.ma = async (candles,ma = 200) =>{
     let i = 1
     let pos=candles.length-ma-1;
     let MABuffer = new Array(candles.length).fill(0);
+    candles.sort((a, b) => {
+      return (b[0] - a[0]); // sort decending by time where newest time is first
+    });
  //---- initial accumulation
     if(pos<ma) pos=ma;
     for(i=1;i<ma;i++,pos--)

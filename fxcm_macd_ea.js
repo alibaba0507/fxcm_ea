@@ -32,6 +32,24 @@ module.exports.updateOrders = async ()=>{
   }
 
 }
+
+module.exports.macd_bias = async (candles,cnt,startFrom = 0, tf = 5) =>{
+  let count = cnt + (cnt*0.5);
+  if (count > candles.length-1)
+  {
+    let oldTf = tf;
+    tf = await chooseNextTimeFrame(tf);
+    if (oldTf == tf)
+     return {"bias":-1};
+    return await this.macd_bias(candles,500,startFrom,tf);
+  }
+  let biasMacd = await indic.calcMACDRange(candles,count,startFrom,tf);
+  let oldTF = await chooseNextTimeFrame(tf);
+  if (biasMacd.bias == -1 && oldTF != tf)
+   return await this.macd_bias(candles,count,startFrom,tf);
+  
+  return biasMacd;
+}
 module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
   
  // data.convertCandlesByTime();
@@ -45,22 +63,28 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
   let ma = await indic.ma(candles,12);
   let res = await indic.calcMACDRange(candles,cnt,startFrom,tf);
   
-  let oldTF = chooseNextTimeFrame(tf);
+  /*
+  let oldTF = tf;//chooseNextTimeFrame(tf);
   let biasMacd = await indic.calcMACDRange(candles,cnt,startFrom,oldTF);
   let count = cnt;
   let prevTF = oldTF;
   while (Number(biasMacd.bias) == -1)
   {
     count += (cnt*0.5);
-    if (count + startFrom > candles.length - 1 /*|| (count / cnt) > 5*/)
+    if (count + startFrom > candles.length - 1 /*|| (count / cnt) > 5* /)
       break;
     //oldTF = chooseNextTimeFrame(oldTF);
-    
+    console.log(" >>>>> MACD BIAS [" + oldTF  + "][" + count + "] >>>>>>");
     biasMacd = await indic.calcMACDRange(candles,count,startFrom,oldTF);
     //oldTF = chooseNextTimeFrame(oldTF);
     //if (prevTF == oldTF)
     // break;
     //prevTF = oldTF;
+  }*/
+  let biasMacd = res;
+  if (biasMacd.bias == -1)
+  {
+    biasMacd = await this.macd_bias(candles,cnt,startFrom,tf);
   }
   let result = {};
   result.bias = biasMacd.bias;

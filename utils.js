@@ -132,14 +132,18 @@ module.exports.sleep = (milliseconds) => {
     let tfCandles = [];
     let candleIndx = [];
     if (Array.isArray(candles)) {
+      candles = candles.sort((a, b) => { return (b[0] - a[0]); });
+    
       for (var i = candles.length - 1; i > 0/*candles.length*/; i--) {
+        let minutes = Number(candles[i][0]) / 60; // convert to minutes
         let d = new Date(Number(candles[i][0]) * 1000);
        
-        if (i == (candles.length - 1)/*0*/  
-            || d.getMinutes() == time 
-              || d.getMinutes() == 0 
-                || (d.getMinutes() > time 
-                && d.getMinutes()%time == 0 ))
+       // if (i == (candles.length - 1)/*0*/  
+       //     || d.getMinutes() == time 
+       //       || d.getMinutes() == 0 
+        //        || (d.getMinutes() > time 
+        //        && d.getMinutes()%time == 0 ))
+        if (i == (candles.length - 1) || minutes%time==0)
         {
           if (candleIndx.length > 0)
           {
