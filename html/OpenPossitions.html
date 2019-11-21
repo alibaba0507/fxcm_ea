@@ -20,13 +20,36 @@
                                 <font color="red">SELL({{ item.lotsSell }})</font>
                         </td>
                         <td>
-
+                                {% if item.lastBuy_pips < 0 %}
+                                <font color="red">{{ item.lastBuy_pips | round(5)}}</font>
+                                {% else %}
+                                <font color="green">{{ item.lastBuy_pips | round(5) }}</font>
+                                {% endif %}
+                                -- L({{ item.lastBuy_lots}})
                         </td>
                         <td>
-
+                                {% if item.lastSell_pips < 0 %}
+                                <font color="red">{{ item.lastSell_pips | round(5)}}</font>
+                                {% else %}
+                                <font color="green">{{ item.lastSell_pips | round(5) }}</font>
+                                {% endif %}
+                                -- L({{ item.lastSell_lots}})
                         </td>
                         <td>
-
+                                {% if item.closeBuy_pips < 0 %}
+                                <font color="red">{{ item.closeBuy_pips | round(5)}}</font>
+                                {% else %}
+                                <font color="green">{{ item.closeBuy_pips | round(5) }}</font>
+                                {% endif %}
+                                -- L({{ item.closeBuy_lots}})
+                        </td>
+                        <td>
+                                {% if item.closeSell_pips < 0 %}
+                                <font color="red">{{ item.closeSell_pips | round(5)}}</font>
+                                {% else %}
+                                <font color="green">{{ item.closeSell_pips | round(5) }}</font>
+                                {% endif %}
+                                -- L({{ item.closeSell_lots}})
                         </td>
                 </tr>
                 {% endfor %}

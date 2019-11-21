@@ -47,7 +47,7 @@ module.exports.macd_bias = async (candles,cnt,startFrom = 0, tf = 5) =>{
   let oldTF = await chooseNextTimeFrame(tf);
   if (biasMacd.bias == -1 && oldTF != tf)
    return await this.macd_bias(candles,count,startFrom,tf);
-  
+  console.log(" >>>>> MACD BIAS [" + candles.length + "][" + count + "]TF["  +tf + "]>>>>>>");
   return biasMacd;
 }
 module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
@@ -56,10 +56,10 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
   if (candles.length < (cnt + startFrom))
    {return {"error":"candles[" + candles.length + "] smaller than range[" + (cnt+startFrom) + "]"};}
   
-  let close = Number(candles[1][rep.candleParams.BidClose]);
-  let open  = Number(candles[1][rep.candleParams.BidOpen]);
-  let hi  = Number(candles[1][rep.candleParams.BidHigh]);
-  let low  = Number(candles[1][rep.candleParams.BidLow]);
+  let close = Number(candles[0][rep.candleParams.BidClose]);
+  let open  = Number(candles[0][rep.candleParams.BidOpen]);
+  let hi  = Number(candles[0][rep.candleParams.BidHigh]);
+  let low  = Number(candles[0][rep.candleParams.BidLow]);
   let ma = await indic.ma(candles,12);
   let res = await indic.calcMACDRange(candles,cnt,startFrom,tf);
   
