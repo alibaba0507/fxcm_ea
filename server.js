@@ -32,8 +32,19 @@ app.post("/update_token", async (req,res)=>{
        // we must save token
        //fs.writeFileSync('token.txt', req.body.token);
        let token = req.body.token;
-       rep.config.token = token.trim();
-       await candles.subscibe(true);
+       let server = req.body.server_url;
+       let minLot = req.body.minLots;
+       let maxLot = req.body.maxLots;
+       if (token && token.length > 0)
+        rep.config.token = token.trim();
+       if (server && server.length > 0)
+        rep.config.server_url = server;
+       if (minLot && Number(minLot) > 0)
+         rep.config.minLot = minLot;
+        if (maxLots && Number(maxLots) > 0)
+          rep.config.maxLot = maxLots;
+
+      // await candles.subscibe(true);
    }
    return res.send('<b>Token has been saved');
   }catch (e)
@@ -47,6 +58,18 @@ app.get( '/ping', function( req, res ) {
     console.log(' >>>>>>> Calling Ping Server ....');
     res.send(' <b> Ping Success .....');
   });
+
+  app.get( '/settings_291267', function( req, res ) {
+    console.log(' >>>>>>> Calling Settings Server ....');
+    return res.render( 'token.html',{
+      token:rep.config.token,
+      server:rep.config.server_url,
+      minLot:rep.config.minLot,
+      maxLot:rep.config.maxLot
+  });
+
+  });
+
 
   app.get( '/open_orders_291267', async ( req, res )=> {
     await require('./fxcm_orders').updateOpenPositions();
@@ -118,7 +141,15 @@ app.get( '/ping', function( req, res ) {
    
     for (let i = 0;i < trading.length;i++)
     {
-        await candles.loadCandles(i,rep.candlesCount);
+        let res = await candles.loadCandles(i,rep.candlesCount);
+        console.log(">>>>>> ##$$$ AFTER CANDLES @###### ",res);
+        if (res.err)
+        {
+          console.log(" ERRRPRRRRRPOOOOORRRR LOAD CANDLE >>>>> SEND EMAIL");
+          rep.mail("FXCM Socket Error","Error[" + res.err + "]<br>Message[" + res.msg + "]<br>");
+          rep.store.set('subscribe',"0");
+          return;
+        }
         await utils.sleep(500);
     }
     await utils.sleep(2000);
@@ -136,7 +167,8 @@ app.get( '/ping', function( req, res ) {
 
   app.listen(((process.env.PORT) ? process.env.PORT : 8080),async  () =>{
     console.log('Example app listening on port 8080. - ',process.env.PORT);
-    await updateSotreParams();
-    await updateCandles();
-    task.start();
+    rep.mail("FXCM Socket Error","Error testing ddddd<br>");
+    //await updateSotreParams();
+    //await updateCandles();
+    //task.start();
 });

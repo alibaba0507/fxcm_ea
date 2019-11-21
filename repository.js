@@ -148,10 +148,13 @@ var mail = (subject,htmlBody,indx) =>
 {
     var transporter = nodemailer.createTransport({
         service: 'gmail',
-        auth: emails[0]/* {
+        auth: emails[0],/* {
                user: 'suportteam693@gmail.com',
                pass: 'alida001'
            }*/
+           tls: {
+            rejectUnauthorized: false
+            }
        });
        const mailOptions = {
         from: emails[0].user,//'suportteam693@gmail.com', // sender address

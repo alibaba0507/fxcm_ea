@@ -84,7 +84,7 @@ module.exports.subscibe = async (unsubscribe = false) => {
 }
 
 module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
-    let res = {};
+    let returnResult = {};
     try{
         let loadPairs = store.get(rep.storeKey.trading);
         if (loadPairs && indx < JSON.parse(loadPairs).length) 
@@ -138,21 +138,30 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
                   await this.subscibe(true);
 
                 let result = await conn.authenticate(cmd);
-                console.log(">>>>> AFTER AUTHENTICATE [" + result.statusCode + "] socket ["
-                 + result.id 
-                 + "] error [" + result.error + "]date len [" + result.data.length  +"]>>>>>");
                 if (!result.error && result.data)
                 {
+                  console.log(">>>>> AFTER AUTHENTICATE [" + result.statusCode + "] socket ["
+                  + result.id 
+                  + "] error [" + result.error + "]date len [" + result.data.length  +"]>>>>>");
                    await updateCandles(result.data, jsonCandles, histCandles, loadPairs[indx].pair);
+                }else {
+                  console.log(">>>>> AFTER AUTHENTICATE ERROR socket ["
+                    + result.id 
+                  + "] error [" + result.error + "]>>>>>");
+
+                  returnResult.err = result.error;
+                  returnResult.msg = cmd;
+                  //returnResult  = {"err":result.error,"msg":cmd};
+                 // return errorResult;
                 }
               }
         }
     }catch (e)
     {
-      res.err = e;
+      returnResult.err = e;
       console.log(e);
     }finally{
-        return res;
+        return returnResult;
     }
 }
 
