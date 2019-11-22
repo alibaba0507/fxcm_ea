@@ -197,7 +197,8 @@ var mail = (subject,htmlBody,indx) =>
   config.price_host = 'www.freeforexapi.com/api/live?pairs=';
   config.price_port = 80;
   config.trading_pairs = 'AUDUSD,EURUSD,GBPUSD,USDJPY,EURGBP,USDCHF,USDXAU';
-  config.token = "73f3480646b5a43d8cb379724a2c8e7fc5e38858"; // get this from http://tradingstation.fxcm.com/
+  //config.token = "73f3480646b5a43d8cb379724a2c8e7fc5e38858"; // get this from http://tradingstation.fxcm.com/
+  config.token = "";
   config.trading_api_host = 'api.fxcm.com';
   config.trading_api_port = 443;
   config.trading_api_proto = 'https'; // http or https

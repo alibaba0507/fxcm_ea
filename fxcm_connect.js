@@ -30,7 +30,7 @@ var request_headers = {
 module.exports.authenticate = async (command,callback,indx=0) =>{
 	let socket;
 	try{
-		if (!store.config.token)
+		if (!store.config.token || store.config.token.length <= 0)
 		{
 			store.config.token = require('fs').readFileSync('token.txt').toString();
 			store.config.token = store.config.token.split(/\r?\n/)[0]; // need only first line

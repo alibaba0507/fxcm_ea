@@ -82,7 +82,7 @@ app.get( '/ping', function( req, res ) {
   });
 
 
-
+/*
   var task = cron.schedule('* * * * *', () => {
    
     console.log(' >>>>> PING SERVER EVERY 1 MIN WORKER ....>>>>>');
@@ -94,7 +94,7 @@ app.get( '/ping', function( req, res ) {
         http.get(ping_url, (resp) => {
             let htmlData = '';
             resp.on('data', (chunk) => {htmlData += chunk;});
-            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);*/});
+            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);* /});
             }).on("error", (err) => { console.log("Error: " + err.message);
         });
      }else
@@ -102,13 +102,13 @@ app.get( '/ping', function( req, res ) {
         https.get(ping_url, (resp) => {
             let htmlData = '';
             resp.on('data', (chunk) => {htmlData += chunk;});
-            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);*/});
+            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);* /});
             }).on("error", (err) => { console.log("Error: " + err.message);
         });
     }
     if ((new Date().getMinutes() % 5) == 0) {updateCandles();  }
   });
-
+ */
 
 
   async function updateSotreParams () {
@@ -168,9 +168,9 @@ app.get( '/ping', function( req, res ) {
   app.listen(((process.env.PORT) ? process.env.PORT : 8080),async  () =>{
     console.log('Example app listening on port 8080. - ',process.env.PORT);
     //rep.mail("FXCM Socket Error","Error testing ddddd<br>");
-    //await updateSotreParams();
-    //await updateCandles();
-    //task.start();
-    let macd = await require('./alphavantage_ea').macd("EURUSD");
+    await updateSotreParams();
+    await updateCandles();
+    task.start();
+    //let macd = await require('./alphavantage_ea').macd("EURUSD");
     console.log(">>>>>>> MACD [EURUSD] ",macd);
 });
