@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+        <div class="row">
+                <div class="col-sm">
+                        <form action="/open_order" id="order_form" method="POST">
+                             <input type="hidden" name="pair" value="{{pair}}">
+                             <input type="hidden" name="type" value="{{type}}">
+                             <div class="row">
+                                    {% if type == 1 %}
+                                    <label for="pair" >Open <b>BUY</b> Order Live for {{pair}}</label>
+                                    {% else %}
+                                    <label for="pair" >Open <b>SELL</b> Order Live for {{pair}}</label>
+                                    {% endif %}
+                             </div>
+                             <div class="row">
+                                    <label for="Lots" >Order Lots</label>
+                                    <input type="text" name="lots" value="{{ lots }}">
+                            </div>
+                            <div class="col-sm">
+                                    <button form="order_form" type="submit">Submit</button>
+                            </div>
+                        </form>
+                </div>
+        </div>
+
+</body>

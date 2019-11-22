@@ -7,7 +7,9 @@
                             <th>Last Open Buy</th>
                             <th>Last Open Sell</th>
                             <th>Closest Buy</th>
-                            <th>Closest Sell</th></tr>
+                            <th>Closest Sell</th>
+                            <th>Open Order</th>
+                            <th>Open Future Position</th></tr>
                  {% for item in open_positions | sort(false, true, 'pair')  %}
                  <tr>
                         <td>{{ item.pair }}</td>
@@ -58,6 +60,14 @@
                                 -- L({{ item.closeSell_lots}})
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <a href="/close?tradeId={{ item.lastSell_tradeId }}">X</a>
+                        </td>
+                        <td>
+                         <a link="/open?pair={{ item.pair }}&type=1" >BUY</a> <br>
+                         <a link="/open?pair={{ item.pair }}&type=0" >SELL</a> <br>
+                        </td>
+                        <td>
+                                <a link="/openFuture?pair={{ item.pair }}&type=1" >Future BUY</a> <br>
+                                <a link="/openFuture?pair={{ item.pair }}&type=0" >Future SELL</a> <br>
                         </td>
                 </tr>
                 {% endfor %}

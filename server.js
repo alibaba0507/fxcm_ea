@@ -61,11 +61,23 @@ app.get( '/close', async function( req, res ) {
   {
     let selectedOrder = await ord.orderByTradeId(req.query.tradeId);
     let result = await ord.closeOrder(selectedOrder);
-    res.send(' <b> After Closing order ..... <br>' + JSON.stringify(result));
+    req.url = "/open_orders_291267?ord=" + JSON.stringify(result);
+    app.handle(req, res);
+    //res.send(' <b> After Closing order ..... <br>' + JSON.stringify(result));
   }else
     res.send(' <b> Missing TradeId Parameter.....');
 });
-
+app.get( '/open_orders_291267', async ( req, res )=> {
+  //await require('./fxcm_orders').updateOpenPositions();
+  let openPos = await templates.createOrderTemplate();
+  console.log(" >>>>>> get Info ",openPos);
+  //let clientData = !{ JSON.stringify(openPos) };
+  let ordInfo =  (req.query.ord)? (req.query.ord):"";
+  return res.render( 'index.html',{
+      orderInfo:ordInfo,
+      open_positions:openPos
+  });
+});
 app.get( '/ping', function( req, res ) {
     console.log(' >>>>>>> Calling Ping Server ....');
     res.send(' <b> Ping Success .....');
@@ -83,15 +95,7 @@ app.get( '/ping', function( req, res ) {
   });
 
 
-  app.get( '/open_orders_291267', async ( req, res )=> {
-    //await require('./fxcm_orders').updateOpenPositions();
-    let openPos = await templates.createOrderTemplate();
-    console.log(" >>>>>> get Info ",openPos);
-    //let clientData = !{ JSON.stringify(openPos) };
-    return res.render( 'index.html',{
-        open_positions:openPos
-    });
-  });
+  
 
 
 

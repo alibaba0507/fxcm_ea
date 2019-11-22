@@ -122,7 +122,7 @@ module.exports.checkForEmailSignal = async () =>{
                   + parseFloat(ordBuy.pips).toFixed(5) + "</font>"
                   + "-- L("  +ordBuy.ord.amountK + ")&nbsp;&nbsp;&nbsp;&nbsp;"
                   + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + ordBuy.ord.tradeId + "\">X</a><br>"
-                  +  + "OR <font color=\"" + ((Number(ordBuy.closestPips) < 0)?"red":"green")  + "\">"
+                  +  "OR <font color=\"" + ((Number(ordBuy.closestPips) < 0)?"red":"green")  + "\">"
                   + parseFloat(ordBuy.closestPips).toFixed(5) + "</font>"
                   + "-- L("  +ordBuy.closestOrder.amountK + ")&nbsp;&nbsp;&nbsp;&nbsp;"
                   + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + ordBuy.closestOrder.tradeId + "\">X</a> </td>"
@@ -140,7 +140,8 @@ module.exports.checkForEmailSignal = async () =>{
     }// end for (let i = 0;i < pairsToUpdate.length;i++)
     if (rows.length > 0)
     { // prepare email
-      htmlEmailBody = "New Signals for pairs: <br>";
+      htmlEmailBody = "New Signals for pairs: <br>"
+        + "<a href=\"" + rep.config.server_url + "/settings_291267" + "\">Check Orders Online</a><br>" 
         + "<table><tr><th>Pairs</th><th>Bias</th><th>Lots</th><th>Last Buy Order</th><th>Last Sell Order</th></tr>";
         for (let i = 0;i < rows.length;i++)
         {
