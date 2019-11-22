@@ -23,7 +23,7 @@ module.exports.checkForEmailSignal = async () =>{
     let htmlEmailBody = "";
     let row = "";
     let rows = [];
-    await ords.updateOpenPositions();
+   // await ords.updateOpenPositions();
     for (let i = 0;i < pairsToUpdate.length;i++)
     {
       let pair = pairsToUpdate[i].pair;

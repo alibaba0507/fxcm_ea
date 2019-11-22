@@ -5,6 +5,19 @@ let utils = require('./utils');
 
 let conn = require('./fxcm_connect');
 
+module.exports.orderByTradeId = async (tradeId) =>
+{
+    try{
+        let acc_open_ords = store.get(rep.storeKey.open_possitions);
+        if (!acc_open_ords) return;
+        acc_open_ords = JSON.parse(acc_open_ords);
+        let pos = acc_open_ords.find((e)=>{return (e.tradeId === tradeId);});
+        return pos;
+    }catch (e)
+    {
+        console.log(e.stack);
+    }
+}
 module.exports.orderLots = async (pair)=>{
     let acc_open_ords = store.get(rep.storeKey.open_possitions);
     if (!acc_open_ords) {return {"pair":pair,"error":"No lots present for[" + pair + "]"};}
@@ -265,6 +278,22 @@ module.exports.closeOrder = async (order) =>{
      {
          console.log(">>>>>>> AFTER CLOSING ORDER [" + order.tradeId + "]");
          console.log(ord_data);
+         let acc_open_ords = store.get(rep.storeKey.open_possitions);
+        // if (!acc_open_ords) {return {"pair":pair,"error":"No lastOrders for[" + pair + "]"};}
+         acc_open_ords = JSON.parse(acc_open_ords);
+         let k = 0;
+         for (k = 0;k < acc_open_ords.length;k++)
+         {
+             if (acc_open_ords[k].tradeId == order.tradeId)
+              break;
+         }
+         if (k < acc_open_ords.length)
+         {
+            // remove order 
+            acc_open_ords.splice(k,1);
+            // save the result
+             store.set(rep.storeKey.open_possitions,JSON.stringify(acc_open_ords));
+         }
      }
      return ord_data;
 } 

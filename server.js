@@ -54,6 +54,18 @@ app.post("/update_token", async (req,res)=>{
 
 })
 
+
+app.get( '/close', async function( req, res ) {
+  let ord = require('./fxcm_orders');
+  if (req.query.tradeId)
+  {
+    let selectedOrder = await ord.orderByTradeId(req.query.tradeId);
+    let result = await ord.closeOrder(selectedOrder);
+    res.send(' <b> After Closing order ..... <br>' + JSON.stringify(result));
+  }else
+    res.send(' <b> Missing TradeId Parameter.....');
+});
+
 app.get( '/ping', function( req, res ) {
     console.log(' >>>>>>> Calling Ping Server ....');
     res.send(' <b> Ping Success .....');
@@ -72,7 +84,7 @@ app.get( '/ping', function( req, res ) {
 
 
   app.get( '/open_orders_291267', async ( req, res )=> {
-    await require('./fxcm_orders').updateOpenPositions();
+    //await require('./fxcm_orders').updateOpenPositions();
     let openPos = await templates.createOrderTemplate();
     console.log(" >>>>>> get Info ",openPos);
     //let clientData = !{ JSON.stringify(openPos) };
@@ -82,8 +94,8 @@ app.get( '/ping', function( req, res ) {
   });
 
 
-/*
-  var task = cron.schedule('* * * * *', () => {
+
+  var task = cron.schedule('* * * * *', async () => {
    
     console.log(' >>>>> PING SERVER EVERY 1 MIN WORKER ....>>>>>');
      //updateCandles();
@@ -94,7 +106,7 @@ app.get( '/ping', function( req, res ) {
         http.get(ping_url, (resp) => {
             let htmlData = '';
             resp.on('data', (chunk) => {htmlData += chunk;});
-            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);* /});
+            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);*/});
             }).on("error", (err) => { console.log("Error: " + err.message);
         });
      }else
@@ -102,13 +114,16 @@ app.get( '/ping', function( req, res ) {
         https.get(ping_url, (resp) => {
             let htmlData = '';
             resp.on('data', (chunk) => {htmlData += chunk;});
-            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);* /});
+            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);*/});
             }).on("error", (err) => { console.log("Error: " + err.message);
         });
     }
-    if ((new Date().getMinutes() % 5) == 0) {updateCandles();  }
+    if ((new Date().getMinutes() % 5) == 0) {
+      await updateCandles();  
+      await templates.checkForEmailSignal();
+    }
   });
- */
+ 
 
 
   async function updateSotreParams () {
@@ -152,8 +167,9 @@ app.get( '/ping', function( req, res ) {
         }
         await utils.sleep(500);
     }
+    await require('./fxcm_orders').updateOpenPositions();
     await utils.sleep(2000);
-    
+    //await ord
     console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO PRICE &&&&&&& ");
     candles.subscibe();
     
@@ -172,5 +188,5 @@ app.get( '/ping', function( req, res ) {
     await updateCandles();
     task.start();
     //let macd = await require('./alphavantage_ea').macd("EURUSD");
-    console.log(">>>>>>> MACD [EURUSD] ",macd);
+    //console.log(">>>>>>> MACD [EURUSD] ",macd);
 });
