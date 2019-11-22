@@ -26,8 +26,12 @@ nunjucks.configure( PATH_TO_TEMPLATES, {
 } ) ;
 
 app.post("/open_order",async (req,res)=>{
-  req.url = "/open_orders_291267?ord=";// + JSON.stringify(result);
-    app.handle(req, res);
+   
+  //req.url = "/open_orders_291267?ord=";// + JSON.stringify(result);
+    //app.handle(req, res);
+    let url = "/open_orders_291267?ord='<b>Redirect From open order form'";
+    //app.handle(req, res);
+    res.redirect( url);
 } );
 
 app.post("/update_token", async (req,res)=>{
@@ -46,15 +50,19 @@ app.post("/update_token", async (req,res)=>{
         rep.config.server_url = server;
        if (minLot && Number(minLot) > 0)
          rep.config.minLot = minLot;
-        if (maxLots && Number(maxLots) > 0)
-          rep.config.maxLot = maxLots;
+        if (maxLot && Number(maxLot) > 0)
+          rep.config.maxLot = maxLot;
 
       // await candles.subscibe(true);
    }
-   return res.send('<b>Token has been saved');
+   //return res.send('<b>Token has been saved');
+   let url = "/open_orders_291267?ord='<b>Token has been saved'";
+   //app.handle(req, res);
+   res.redirect( url);
   }catch (e)
   {
-      return res.send('<b>Error saving token ',e.toString());
+     console.log(e.stack);
+      return res.send('<b>Error saving token ' + e.toString());
   }
 
 })
@@ -66,8 +74,8 @@ app.get( '/close', async function( req, res ) {
   {
     let selectedOrder = await ord.orderByTradeId(req.query.tradeId);
     let result = await ord.closeOrder(selectedOrder);
-    req.url = "/open_orders_291267?ord=" + JSON.stringify(result);
-    app.handle(req, res);
+    let url = "/open_orders_291267?ord=" + JSON.stringify(result);
+    res.redirect( url);
     //res.send(' <b> After Closing order ..... <br>' + JSON.stringify(result));
   }else
     res.send(' <b> Missing TradeId Parameter.....');
@@ -75,6 +83,7 @@ app.get( '/close', async function( req, res ) {
 app.get( '/open_orders_291267', async ( req, res )=> {
   //await require('./fxcm_orders').updateOpenPositions();
   let openPos = await templates.createOrderTemplate();
+  await templates.macdSignalToEmail(openPos);
   console.log(" >>>>>> get Info ",openPos);
   //let clientData = !{ JSON.stringify(openPos) };
   let ordInfo =  (req.query.ord)? (req.query.ord):"";
@@ -146,7 +155,7 @@ app.get( '/ping', function( req, res ) {
     if ((new Date().getMinutes() % 5) == 0) {
       await updateCandles();  
       //await templates.checkForEmailSignal();
-      await templates.macdSignalToEmail();
+      //await templates.macdSignalToEmail();
     }
   });
  
@@ -200,7 +209,8 @@ app.get( '/ping', function( req, res ) {
     candles.subscibe();
     
     await utils.sleep(2000);
-    
+    let openPos = await templates.createOrderTemplate();
+    await templates.macdSignalToEmail(openPos);
     //await macd();
     
    //rep.mail('FXCM Test mail',"<b> This is is a test");

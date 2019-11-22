@@ -153,14 +153,16 @@ module.exports.checkForEmailSignal = async () =>{
   }
 }
 
-module.exports.macdSignalToEmail = async () =>
+module.exports.macdSignalToEmail = async (openPos) =>
 {
-  let openPos = await this.createOrderTemplate(); 
+  //let openPos = await this.createOrderTemplate(); 
   let rows = [];
   try{
+  console.log(">>>>>>> createOrderTemplate [" + openPos.length + "]>>>>>>>");
   openPos.forEach((e) =>{
     //let row = [];
     let cells =[];
+    console.log(" >>>>>>>>>>>>> PARSE ELEMENT ",e);
     if (e.macd && (e.macd.closeOrder || e.macd.openOrder))
     {
       if (Number(e.macd.bias) == 1)
