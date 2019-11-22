@@ -157,6 +157,7 @@ module.exports.macdSignalToEmail = async () =>
 {
   let openPos = await this.createOrderTemplate(); 
   let rows = [];
+  try{
   openPos.forEach((e) =>{
     //let row = [];
     let cells =[];
@@ -269,7 +270,12 @@ module.exports.macdSignalToEmail = async () =>
       htmlEmailBody += "</tr>";
     }
     htmlEmailBody += "</table>";
+    console.log(">>>>>> #### SENDIGN EMAIL ALERT ######$$$>>>>>");
     rep.mail('FXCM EA Alert',htmlEmailBody);
+  }
+  }catch(e)
+  {
+    console.log(e.stack);
   }
 }
 /**

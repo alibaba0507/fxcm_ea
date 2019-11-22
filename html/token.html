@@ -9,30 +9,40 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 </head>
 <body>
-
-<div class="row">
-    <div class="col-sm">
-            <form action="/update_token" id="tokne_form" method="POST">
-                <div class="row">
-                    <label for="Toekn" >FXCM Token</label>
-                    <input type="text" name="token" value="{{ token }}">
-                </div>
-                <div class="row">
-                        <label for="ServerUrl" >Server Url</label>
-                        <input type="text" name="server_url" value="{{ server }}">
-                </div>
-                <div class="row">
-                        <label for="minLots" >Min open Lots</label>
-                        <input type="text" name="minLots" value="{{ minLot }}">
-                </div>
-                <div class="row">
-                        <label for="maxLots" >Max open Lots</label>
-                        <input type="text" name="maxLots" value="{{ maxLot }}">
-                </div>
-                <div class="col-sm">
-                    <button form="tokne_form" type="submit">Submit</button>
-                </div>
-            </form>
+<div class="container">
+        <h2>My Trading View</h2>
+        <font color="red">
+            <b>
+        <p>This Form will update Setting related to trading </p>
+        <p> Please Be Very Carefull !!!!</p>
+        </b>
+        </font>
+    <div class="content">
+        <div class="row">
+            <div class="col-sm">
+                    <form action="/update_token" id="tokne_form" method="POST">
+                        <div class="row">
+                            <label for="Toekn" >FXCM Token</label>
+                            <input type="text" name="token" value="{{ token }}">
+                        </div>
+                        <div class="row">
+                                <label for="ServerUrl" >Server Url</label>
+                                <input type="text" name="server_url" value="{{ server }}">
+                        </div>
+                        <div class="row">
+                                <label for="minLots" >Min open Lots</label>
+                                <input type="text" name="minLots" value="{{ minLot }}">
+                        </div>
+                        <div class="row">
+                                <label for="maxLots" >Max open Lots</label>
+                                <input type="text" name="maxLots" value="{{ maxLot }}">
+                        </div>
+                        <div class="col-sm">
+                            <button form="tokne_form" type="submit">Submit</button>
+                        </div>
+                    </form>
+            </div>
+        </div>
     </div>
 </div>
 </body>
