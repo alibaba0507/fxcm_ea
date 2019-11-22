@@ -25,6 +25,11 @@ nunjucks.configure( PATH_TO_TEMPLATES, {
     express: app
 } ) ;
 
+app.post("/open_order",async (req,res)=>{
+  req.url = "/open_orders_291267?ord=";// + JSON.stringify(result);
+    app.handle(req, res);
+} );
+
 app.post("/update_token", async (req,res)=>{
   try{
    if (req.body.token)
@@ -82,6 +87,22 @@ app.get( '/ping', function( req, res ) {
     console.log(' >>>>>>> Calling Ping Server ....');
     res.send(' <b> Ping Success .....');
   });
+
+  app.get( '/open', function( req, res ) {
+    return res.render( 'openForm.html',{
+      pair:req.query.pair,
+      type:req.query.type,
+      lots:rep.config.minLot,
+      maxLot:rep.config.maxLot
+  });
+  });
+
+  app.get( '/openFuture', function( req, res ) {
+    console.log(' >>>>>>> Calling Ping Server ....');
+    res.send(' <b> Ping Success .....');
+  });
+
+
 
   app.get( '/settings_291267', function( req, res ) {
     console.log(' >>>>>>> Calling Settings Server ....');

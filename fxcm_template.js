@@ -141,7 +141,7 @@ module.exports.checkForEmailSignal = async () =>{
     if (rows.length > 0)
     { // prepare email
       htmlEmailBody = "New Signals for pairs: <br>"
-        + "<a href=\"" + rep.config.server_url + "/settings_291267" + "\">Check Orders Online</a><br>" 
+        + "<a href=\"" + rep.config.server_url + "/open_orders_291267s" + "\">Check Orders Online</a><br>" 
         + "<table><tr><th>Pairs</th><th>Bias</th><th>Lots</th><th>Last Buy Order</th><th>Last Sell Order</th></tr>";
         for (let i = 0;i < rows.length;i++)
         {
@@ -150,6 +150,126 @@ module.exports.checkForEmailSignal = async () =>{
         htmlEmailBody += "</table>";
         rep.mail('FXCM EA Alert',htmlEmailBody);
     }
+  }
+}
+
+module.exports.macdSignalToEmail = async () =>
+{
+  let openPos = await this.createOrderTemplate(); 
+  let rows = [];
+  openPos.forEach((e) =>{
+    //let row = [];
+    let cells =[];
+    if (e.macd && (e.macd.closeOrder || e.macd.openOrder))
+    {
+      if (Number(e.macd.bias) == 1)
+      {
+        if (e.macd.closeOrder && e.macd.closeOrder == 1 && Number (e.lotsBuy) > Number(e.lotsSell)
+           && Number(e.lastBuy_grossPl) > (Number(e.lastBuy_lots)*1.5))
+        {
+          cells.push(e.pair);
+          cells.push("BUY(BIAS) CLOSE BUY");
+          cells.push("<font color=\"green\">BUY(" + e.lotsBuy + ")</font>--"
+                     + "<font color=\"red\">SELL(" + e.lotsSell + ")</font>--");
+          cells.push("<font color=\"" + ((Number(e.lastBuy_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastBuy_pips).toFixed(5) + "</font>"
+          + "-- L("  + e.lastBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+          + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.lastBuy_tradeId + "\">X</a> ");
+          cells.push("<font color=\"" + ((Number(e.lastSell_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastSell_pips).toFixed(5) + "</font>"
+                  + "-- L("  + e.lastSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;");
+        }
+        if (e.macd.openOrder && e.macd.openOrder == 1 && Number(e.lotsBuy) - Number(e.lotsSell) < rep.config.maxLot)
+        { 
+          let pipsDiff  = Number(e.lastBuy_grossPl)  / Number(e.lastBuy_lots);
+          if (pipsDiff < -2 || (pipsDiff > 1 && Number(e.lotsBuy) - Number(e.lotsSell) <= 0))
+          {
+            cells.push(e.pair);
+            cells.push("BUY(BIAS) OPEN BUY");
+            cells.push("<font color=\"green\">BUY(" + e.lotsBuy + ")</font>--"
+                     + "<font color=\"red\">SELL(" + e.lotsSell + ")</font>--");
+           cells.push("<font color=\"" + ((Number(e.lastBuy_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastBuy_pips).toFixed(5) + "</font>"
+          + "-- L("  + e.lastBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;");
+          cells.push("<font color=\"" + ((Number(e.lastSell_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastSell_pips).toFixed(5) + "</font>"
+                  + "-- L("  + e.lastSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+                  + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.lastSell_trendId + "\">X</a> <br>"
+                   + " OR"
+                   + "<font color=\"" + ((Number(e.closeSell_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.closeSell_pips).toFixed(5) + "</font>"
+                  + "-- L("  + e.closeSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+                  + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.closeSell_tradeId + "\">X</a> <br>"
+                  );
+          }
+
+        }
+      }// end if (Number(e.macd.bias) == 1)
+ //------------------------------ SELL --------------------------------------------//
+      if (Number(e.macd.bias) == 0)
+      {
+        if (typeof e.macd.closeOrder != undefined 
+              && e.macd.closeOrder == 0 && Number (e.lotsSell) > Number(e.lotsBuy)
+           && Number(e.lastSell_grossPl) > (Number(e.lastSell_lots)*1.5))
+        {
+          cells.push(e.pair);
+          cells.push("BUY(SELL) CLOSE BUY");
+          cells.push("<font color=\"green\">BUY(" + e.lotsBuy + ")</font>--"
+                     + "<font color=\"red\">SELL(" + e.lotsSell + ")</font>--");
+          cells.push("<font color=\"" + ((Number(e.lastBuy_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastBuy_pips).toFixed(5) + "</font>"
+          + "-- L("  + e.lastBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;");
+          cells.push("<font color=\"" + ((Number(e.lastSell_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastSell_pips).toFixed(5) + "</font>"
+                  + "-- L("  + e.lastSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+                  + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.lastSell_trendId + "\">X</a> ");
+        }
+        if (typeof e.macd.openOrder != undefined 
+                && e.macd.openOrder == 0 && Number(e.lotsSell) - Number(e.lotsBuy) < rep.config.maxLot)
+        { 
+          let pipsDiff  = Number(e.lastSell_grossPl)  / Number(e.lastSell_lots);
+          if (pipsDiff < -2 || (pipsDiff > 1 && Number(e.lotsSell) - Number(e.lotsBuy) <= 0))
+          {
+            cells.push(e.pair);
+            cells.push("BUY(SELL) OPEN SELL");
+            cells.push("<font color=\"green\">BUY(" + e.lotsBuy + ")</font>--"
+                     + "<font color=\"red\">SELL(" + e.lotsSell + ")</font>--");
+           cells.push("<font color=\"" + ((Number(e.lastBuy_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastBuy_pips).toFixed(5) + "</font>"
+                + "-- L("  + e.lastBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+                + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.lastBuy_tradeId + "\">X</a> <br>"
+                + "OR "
+                + "<font color=\"" + ((Number(e.closeBuy_pips) < 0)?"red":"green")  + "\">"
+                + parseFloat(e.closeBuy_pips).toFixed(5) + "</font>"
+              + "-- L("  + e.closeBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+              + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.closeBuy_tradeId + "\">X</a> <br>");
+          cells.push("<font color=\"" + ((Number(e.lastSell_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastSell_pips).toFixed(5) + "</font>"
+                  + "-- L("  + e.lastSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;");
+          }
+
+        }
+      }// end if (Number(e.macd.bias) == 0)
+
+    }// end if (e.macd && (e.macd.closeOrder || e.macd.openOrder))
+    if (cells.length > 0)
+     rows.push(cells);
+  });//end openPos.forEach((e) =>{
+  if (rows.length)
+  {
+    let htmlEmailBody = "New Signals for pairs: <br>"
+    + "<a href=\"" + rep.config.server_url + "/open_orders_291267s" + "\">Check Orders Online</a><br>" 
+    + "<table><tr><th>Pairs</th><th>Bias</th><th>Lots</th><th>Last Buy Order</th><th>Last Sell Order</th></tr>";
+    for (let i = 0;i < rows.length;i++)
+    {
+      let c = rows[i];
+      htmlEmailBody += "<tr>";
+      for (let k = 0;i < c.length;k++)
+       htmlEmailBody += "<td>" + c[k] + "</td>";
+      htmlEmailBody += "</tr>";
+    }
+    htmlEmailBody += "</table>";
+    rep.mail('FXCM EA Alert',htmlEmailBody);
   }
 }
 /**
@@ -192,9 +312,11 @@ module.exports.createOrderTemplate = async () =>{
               ,"lastBuy_tradeId":ordBuy.ord.tradeId
               ,"lastBuy_pips":ordBuy.pips
               ,"lastBuy_lots":ordBuy.ord.amountK
+              ,"lastBuy_grossPl":ordBuy.ord.grossPL
               ,"lastSell_trendId":ordSell.ord.tradeId
               ,"lastSell_pips":ordSell.pips
               ,"lastSell_lots":ordSell.ord.amountK
+              ,"lastSell_grossPl":ordSell.ord.grossPL
               ,"closeBuy_tradeId":ordBuy.closestOrder.tradeId
               ,"closeBuy_lots":ordBuy.closestOrder.amountK
               ,"closeBuy_pips":ordBuy.closestPips
