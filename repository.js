@@ -192,6 +192,7 @@ var mail = (subject,htmlBody,indx) =>
   config.alphavantage_load_candles = 'FX_INTRADAY';
   config.alphavantage_SMA = 'SMA';
   config.alphavantage_SAR = 'SAR';
+  config.alphavantage_MACD = 'MACD';
 
   config.price_host = 'www.freeforexapi.com/api/live?pairs=';
   config.price_port = 80;

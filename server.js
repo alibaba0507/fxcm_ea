@@ -168,7 +168,9 @@ app.get( '/ping', function( req, res ) {
   app.listen(((process.env.PORT) ? process.env.PORT : 8080),async  () =>{
     console.log('Example app listening on port 8080. - ',process.env.PORT);
     //rep.mail("FXCM Socket Error","Error testing ddddd<br>");
-    await updateSotreParams();
-    await updateCandles();
-    task.start();
+    //await updateSotreParams();
+    //await updateCandles();
+    //task.start();
+    let macd = await require('./alphavantage_ea').macd("EURUSD");
+    console.log(">>>>>>> MACD [EURUSD] ",macd);
 });
