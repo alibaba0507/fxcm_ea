@@ -145,7 +145,8 @@ app.get( '/ping', function( req, res ) {
     }
     if ((new Date().getMinutes() % 5) == 0) {
       await updateCandles();  
-      await templates.checkForEmailSignal();
+      //await templates.checkForEmailSignal();
+      await templates.macdSignalToEmail();
     }
   });
  
