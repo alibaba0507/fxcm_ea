@@ -5,7 +5,7 @@ const fetch = require("node-fetch");
 /**
  * @param interval available are 1min, 5min, 15min, 30min, 60min, daily, weekly, monthly
  */
-module.exports.macd = async (pair,fastperiod=12,slowperiod=26,signalperiod=9,interval='5min',period = 500)=>{
+module.exports.macd = async (pair,interval='5min',period = 500,fastperiod=12,slowperiod=26,signalperiod=9)=>{
     try {
         let url = rep.config.alphavantage_proto + "://" 
                         +  rep.config.alphavantage_url + "function=" + rep.config.alphavantage_MACD 
@@ -96,26 +96,30 @@ module.exports.macd_signal = async (macdArray , sig,period = 500) =>
     if (ratio > 0.82)
       return await this.macd_signal(macdArray,sig,period + (period*0.5));
     
-    if (macdArray[1] > avrg_top * 3 && macdArray[1] < sig[1])
+    if (macdArray[0] > avrg_top * 3 && macdArray[0] < sig[0] 
+           && (macdArray[1] > sig[1] || macdArray[2] > sig[2]))
     {
         return {"macd_top":avrg_top,"macd_bottom":avrg_bottom,"macd":macdArray[1]
         ,"ratio":ratio,"type":type,"signal":1 
          , "msg":"close buy if buy > sell"}; // close buy if buy > sell
     }
-    if (macdArray[1] < avrg_top && type == "BUY" && macdArray[1] > sig[1])
+    if (macdArray[0] < avrg_top && type == "BUY" && macdArray[0] > sig[0]
+          && (macdArray[1] < sig[1] || macdArray[2]) < sig[2])
     {
         return {"macd_top":avrg_top,"macd_bottom":avrg_bottom,"macd":macdArray[1]
         ,"ratio":ratio,"type":type,"signal":2
          ,"msg":"open buy if (buy - sell) < maxLots"}; // open buy if (buy - sell) < maxLots 
     }
-    if (macdArray[1] < avrg_bottom * 3 && macdArray[1] > sig[1])
+    if (macdArray[0] < avrg_bottom * 3 && macdArray[0] > sig[0]
+          && (macdArray[1] > sig[1] || macdArray[2] > sig[2]))
     {
         return {"macd_top":avrg_top,"macd_bottom":avrg_bottom,"macd":macdArray[1]
         ,"ratio":ratio,"type":type,"signal":3
         ,"msg":"close sell if (sell) > buy"}; // close sell if (sell) > buy 
     }
 
-    if (macdArray[1] > avrg_bottom && type == "SELL" && macdArray[1] < sig[1])
+    if (macdArray[0] > avrg_bottom && type == "SELL" && macdArray[0] < sig[0]
+          && (macdArray[1] > sig[1] || macdArray[2] > sig[2]))
     {
         return {"macd_top":avrg_top,"macd_bottom":avrg_bottom,"macd":macdArray[1]
         ,"ratio":ratio,"type":type,"signal":4
