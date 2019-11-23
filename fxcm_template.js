@@ -159,9 +159,59 @@ module.exports.macdSignalToEmail = async (openPos) =>
   let rows = [];
   try{
   console.log(">>>>>>> createOrderTemplate [" + openPos.length + "]>>>>>>>");
+  let d = new Date();
   openPos.forEach((e) =>{
     //let row = [];
     let cells =[];
+    let pair  =  e.pair.replace(/([^a-z0-9]+)/gi, '');
+    let macdLastHour = rep.store.get("macd_" + pair);
+    if ((!macdLastHour || macdLastHour != d.getHours()) && d.getMinutes() > 50 )
+    {
+      let hourMacd = await require('./alphavantage_ea').macd(pair,"60min",500);
+      rep.store.set("macd_" + pair,d.getHours());
+      if (hourMacd.signal)
+      {
+        if (hourMacd.signal == 1)
+        {
+          cells.push(e.pair);
+          cells.push("1 HOUR(FRAME) CLOSE BUY");
+          cells.push("<font color=\"green\">BUY(" + e.lotsBuy + ")</font>--"
+          + "<font color=\"red\">SELL(" + e.lotsSell + ")</font>--");
+          cells.push("<font color=\"" + ((Number(e.lastBuy_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastBuy_pips).toFixed(5) + "</font>"
+          + "-- L("  + e.lastBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+          + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.lastBuy_tradeId + "\">X</a> "
+          + " OR "
+          + "<font color=\"" + ((Number(e.closeBuy_pips) < 0)?"red":"green")  + "\">"
+          + parseFloat(e.closeBuy_pips).toFixed(5) + "</font>"
+            + "-- L("  + e.closeBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+          + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.closeBuy_tradeId + "\">X</a> ");
+          cells.push("<font color=\"" + ((Number(e.lastSell_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastSell_pips).toFixed(5) + "</font>"
+                  + "-- L("  + e.lastSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;");
+        }
+        if (hourMacd.signal == 3)
+        {
+          cells.push(e.pair);
+          cells.push("1 HOUR(FRAME) CLOSE SELL");
+          cells.push("<font color=\"green\">BUY(" + e.lotsBuy + ")</font>--"
+                     + "<font color=\"red\">SELL(" + e.lotsSell + ")</font>--");
+          cells.push("<font color=\"" + ((Number(e.lastBuy_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastBuy_pips).toFixed(5) + "</font>"
+          + "-- L("  + e.lastBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;");
+          cells.push("<font color=\"" + ((Number(e.lastSell_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.lastSell_pips).toFixed(5) + "</font>"
+                  + "-- L("  + e.lastSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+                  + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.lastSell_trendId + "\">X</a> "
+                  + " OR "
+                  + "<font color=\"" + ((Number(e.closeSell_pips) < 0)?"red":"green")  + "\">"
+                  + parseFloat(e.closeSell_pips).toFixed(5) + "</font>"
+                  + "-- L("  + e.closeSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+                  + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.closeSell_tradeId + "\">X</a> ");
+        }
+        
+      }
+    }
     console.log(" >>>>>>>>>>>>> PARSE ELEMENT ",e);
     if (e.macd && (e.macd.closeOrder || e.macd.openOrder))
     {
@@ -216,7 +266,7 @@ module.exports.macdSignalToEmail = async (openPos) =>
            && Number(e.lastSell_grossPl) > (Number(e.lastSell_lots)*1.5))
         {
           cells.push(e.pair);
-          cells.push("BUY(SELL) CLOSE BUY");
+          cells.push("BUY(SELL) CLOSE SELL");
           cells.push("<font color=\"green\">BUY(" + e.lotsBuy + ")</font>--"
                      + "<font color=\"red\">SELL(" + e.lotsSell + ")</font>--");
           cells.push("<font color=\"" + ((Number(e.lastBuy_pips) < 0)?"red":"green")  + "\">"
