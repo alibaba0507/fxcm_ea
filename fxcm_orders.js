@@ -95,6 +95,7 @@ module.exports.OpenPositionListener = async (update) =>{
         }//end if (pos)
         else
         {
+            store.set("updateOpenPosition",1);
            // let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["Offer","OpenPosition","ClosedPosition","Order","Account", "Summary"] } }'
           /*  let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["OpenPosition"] } }'
             let open_pos = await conn.authenticate(cmd);
@@ -104,11 +105,14 @@ module.exports.OpenPositionListener = async (update) =>{
                 store.store.set(store.storeKey.open_possitions,JSON.stringify (jsonData.open_positions)); 
             }
             */
+            /*
             await this.subscibeOpenPosition(true);
             await utils.sleep(500);
             await this.updateOpenPositions();
             await utils.sleep(500);
             this.subscibeOpenPosition();
+            */
+
         }
     }else
     {
@@ -121,11 +125,13 @@ module.exports.OpenPositionListener = async (update) =>{
             store.store.set(store.storeKey.open_possitions,JSON.stringify (jsonData.open_positions)); 
         }
         */
-        await this.subscibeOpenPosition(true);
+       /* await this.subscibeOpenPosition(true);
         await utils.sleep(500);
         await this.updateOpenPositions();
         await utils.sleep(500);
         this.subscibeOpenPosition();
+        */
+       store.set("updateOpenPosition",1);
     }
   }catch (e)
   {
@@ -141,21 +147,27 @@ module.exports.ClosedPositionListener = async (update) =>{
       if (!jsonData.tradeId || jsonData.isTotal == true){return;}
       //console.log('  UPDATE OPEN POSSITIONS ',jsonData);
       let store_open_pos = store.get(rep.storeKey.open_possitions);
-      if (Array.isArray(JSON.parse(store_open_pos)))
+      if (store_open_pos && Array.isArray(JSON.parse(store_open_pos)))
       {
           store_open_pos = JSON.parse(store_open_pos);
-          let pos = store_open_pos.find((e)=>{return (jsonData.tradeId && e.tradeId === jsonData.tradeId);});
-          if (pos)
-          { // we hava order on open need to be removed
-             // let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["Offer","OpenPosition","ClosedPosition","Order","Account", "Summary"] } }'
-              let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["OpenPosition"] } }'
-              let open_pos = await conn.authenticate(cmd);
-              if (open_pos.data )
-              {
-                  var jsonData = JSON.parse(open_pos.data);
-                  store.store.set(store.storeKey.open_possitions,JSON.stringify (jsonData.open_positions)); 
-              }
-          }
+          //let pos = store_open_pos.find((e)=>{return (jsonData.tradeId && e.tradeId === jsonData.tradeId);});
+          //if (pos)
+         // { // we hava order on open need to be removed
+            
+            let k = 0;
+            for (k = 0;k < store_open_pos.length;k++)
+            {
+                if (store_open_pos[k].tradeId == jsonData.tradeId)
+                 break;
+            }
+            if (k < store_open_pos.length)
+            {
+               // remove order 
+               store_open_pos.splice(k,1);
+               // save the result
+               store.set(rep.storeKey.open_possitions,JSON.stringify(store_open_pos));
+            }
+          //}
       }
     }catch (e)
     {
@@ -253,12 +265,16 @@ module.exports.subscibeClosedPosition = async () =>{
 
 
 module.exports.updateOpenPositions = async () =>{
+    let needUpdate = store.get("updateOpenPosition");
+    if (!needUpdate)
+     return;
     let cmd = '{ "method":"GET", "resource":"/trading/get_model", "params": { "models":["OpenPosition"] } }'
     let open_pos = await conn.authenticate(cmd);
     if (open_pos.data )
     {
         var jsonData = JSON.parse(open_pos.data);
         store.set(rep.storeKey.open_possitions,JSON.stringify (jsonData.open_positions)); 
+        store.delete("updateOpenPosition");
     }
     //console.log(" >>>>>>>> POSITOPNS ",open_pos.data);
     await utils.sleep(500);

@@ -11,6 +11,7 @@ let utils = require('./utils');
 let candles = require('./fxcm_data');
 let rep = require('./repository');
 let storeKey = require('./repository').storeKey;
+let orders =  require('./fxcm_orders');
 let app = express() ;
 
 let ping_url = 'http://localhost:8080/ping';
@@ -80,6 +81,8 @@ app.get( '/close', async function( req, res ) {
   }else
     res.send(' <b> Missing TradeId Parameter.....');
 });
+
+
 app.get( '/open_orders_291267', async ( req, res )=> {
   //await require('./fxcm_orders').updateOpenPositions();
   let openPos = await templates.createOrderTemplate();
@@ -202,13 +205,17 @@ app.get( '/ping', function( req, res ) {
         }
         await utils.sleep(500);
     }
-    await require('./fxcm_orders').updateOpenPositions();
+    await orders.updateOpenPositions();
     await utils.sleep(2000);
     //await ord
     console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO PRICE &&&&&&& ");
     candles.subscibe();
     
     await utils.sleep(2000);
+     orders.subscibeOpenPosition();
+     await utils.sleep(2000);
+     orders.subscibeClosedPosition();
+     await utils.sleep(2000);
     let openPos = await templates.createOrderTemplate();
     await templates.macdSignalToEmail(openPos);
     //await macd();
@@ -220,6 +227,7 @@ app.get( '/ping', function( req, res ) {
   app.listen(((process.env.PORT) ? process.env.PORT : 8080),async  () =>{
     console.log('Example app listening on port 8080. - ',process.env.PORT);
     //rep.mail("FXCM Socket Error","Error testing ddddd<br>");
+    rep.store.set("updateOpenPosition",1);
     await updateSotreParams();
     await updateCandles();
     task.start();
