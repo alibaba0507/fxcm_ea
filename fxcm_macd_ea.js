@@ -88,22 +88,23 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
   }
   let result = {};
   result.bias = biasMacd.bias;
-  if (Number(biasMacd.bias) == 1)
-  { // buy bias
+ // if (Number(biasMacd.bias) == 1)
+ // { // buy bias
     if (Number(res.macd.main[1]) > Number(res.top_macd) * 1.32 && 
         close < open && hi > Number(ma[0]) && low < Number(ma[0]))
         {
           result.closeOrder = 1;
            return result;
         }else if (Number(res.macd.main[1]) < Number(res.top_macd) * 0.62 && 
-          close > open && hi > Number(ma[0]) && low < Number(ma[0]))
+          close > open && hi > Number(ma[0]) && low < Number(ma[0])
+             && Number(biasMacd.bias) == 1)
           {
             result.openOrder = 1;
            return result;
           } 
-  }
-  if (Number(biasMacd.bias) == 0)
-  { // sell bias
+  //}
+  //if (Number(biasMacd.bias) == 0)
+  //{ // sell bias
     if (Number(res.macd.main[1])  < 0 && Number(res.macd.main[1])*(-1) > Number(res.bottom_macd) * 1.32 && 
         close > open && hi > Number(ma[0]) && low < Number(ma[0]))
         {
@@ -111,12 +112,13 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
            return result;
         }else 
          if ( Number(res.macd.main[1]) > Number(res.bottom_macd)*(-0.62) 
-          && close < open && hi > Number(ma[0]) && low < Number(ma[0]))
+          && close < open && hi > Number(ma[0]) && low < Number(ma[0])
+            && Number(biasMacd.bias) == 0)
         {
           result.openOrder = 0;
            return result;
         }
-  }
+  //}
   return result;
 }
 

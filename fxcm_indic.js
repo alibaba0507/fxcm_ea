@@ -157,10 +157,12 @@ module.exports.ma = async (candles,ma = 200) =>{
 /**
  * @param candles array of o,h,l,c prices
  * @param maPeriodAsArray array of ma that form devitioan bands 
- * @param deviation 
+ * @param InpBandsDeviations 
  * @param maPeriod
+ * @returns {"upper":ExtUpperBuffer,"lower":ExtLowerBuffer
+ *   ,"ma":ExtMABuffer,"bandSignal":signal,"maSignal":midSignal};
  */
-module.exports.bands = async (candles,maPeriodAsArray,InpBandsDeviations,maPeriod) =>{
+module.exports.bands = async (candles,maPeriodAsArray,maPeriod,InpBandsDeviations = 2) =>{
   let i = 1
   let pos=candles.length-1;
   let ExtUpperBuffer = new Array(candles.length).fill(0);
@@ -174,14 +176,35 @@ module.exports.bands = async (candles,maPeriodAsArray,InpBandsDeviations,maPerio
   for (let i = 0;i < pos;i++)
   {
     ExtMABuffer[i] = maPeriodAsArray[i];
-    ExtStdDevBuffer[i]= StdDev_Func(i,candles,ExtMABuffer,maPeriod);
+    ExtStdDevBuffer[i]= await StdDev_Func(i,candles,ExtMABuffer,maPeriod);
     //--- upper line
     ExtUpperBuffer[i]=ExtMABuffer[i]+InpBandsDeviations*ExtStdDevBuffer[i];
     //--- lower line
     ExtLowerBuffer[i]=ExtMABuffer[i]-InpBandsDeviations*ExtStdDevBuffer[i];
   }
-
-  return {"upper":ExtUpperBuffer,"lower":ExtLowerBuffer,"ma":ExtMABuffer};
+  let midSignal = -1;
+  let signal = -1;
+  if (Number(candles[1][rep.candleParams.BidLow]) < Number(ExtLowerBuffer[1]))
+    signal = 1;
+  if (Number(candles[1][rep.candleParams.AskHigh]) > Number(ExtUpperBuffer[1]))
+   signal = 0;
+  
+  if (Number(candles[1][rep.candleParams.AskHigh]) > Number(ExtMABuffer[1])
+      &&  Number(candles[1][rep.candleParams.BidLow]) < Number(ExtMABuffer[1]))
+      {
+        if (Number(candles[1][rep.candleParams.BidClose]) > Number(candles[1][rep.candleParams.BidOpen]))
+        { // this is buy
+          if (Number(candles[2][rep.candleParams.AskHigh]) < Number(candles[1][rep.candleParams.AskHigh]))
+            midSignal = 1;
+        }
+        if (Number(candles[1][rep.candleParams.BidClose]) < Number(candles[1][rep.candleParams.BidOpen]))
+        { // this is sell
+          if (Number(candles[2][rep.candleParams.BidLow]) > Number(candles[1][rep.candleParams.BidLow]))
+            midSignal = 0;
+        }
+      } 
+  return {"upper":ExtUpperBuffer,"lower":ExtLowerBuffer
+    ,"ma":ExtMABuffer,"bandSignal":signal,"maSignal":midSignal};
   
 }
 
@@ -190,7 +213,7 @@ async function StdDev_Func (position,candles,maArray,period){
   if(position>=period)
      {
       for(let i=0; i<period; i++)
-        StdDev_dTmp+= Math.pow(candles[position-i]-maArray[position],2);
+        StdDev_dTmp+= Math.pow(candles[position-i][rep.candleParams.BidClose]-maArray[position],2);
       StdDev_dTmp=Math.sqrt(StdDev_dTmp/period);
      }
   return(StdDev_dTmp);

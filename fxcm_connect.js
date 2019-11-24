@@ -76,6 +76,7 @@ module.exports.authenticate = async (command,callback,indx=0) =>{
 		socket.on('disconnect', () => {
 			console.log('Socket disconnected, terminating client.');
 			console.log('@@@@@@@ SOCKET DISCONECT ',command);
+			store.mail("FXCM Socket ERROR",'@@@@@@@ SOCKET DISCONECT '+ command)
 			//process.exit(-1);
 			callback(0,0,'','Socket disconnected, terminating client');
 		});

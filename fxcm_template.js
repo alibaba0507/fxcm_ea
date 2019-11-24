@@ -1,7 +1,8 @@
 let rep = require('./repository');
 let ea = require('./fxcm_macd_ea');
+let band_ea = require('./fxcm_bands_ea');
 let ords = require('./fxcm_orders');
-
+let indic = require('./fxcm_indic');
 module.exports.checkForEmailSignal = async () =>{
   let trading = rep.store.get(rep.storeKey.trading);
   loadPairs = JSON.parse(trading);
@@ -153,6 +154,47 @@ module.exports.checkForEmailSignal = async () =>{
   }
 }
 
+module.exports.bandsSignalToEmail = async(openPos) =>{
+
+  /***********************************************************************8
+   * 
+   * @returns array of {
+ *     "pair",
+ *      "lots":{"pair","buy","sell"},
+ *     "buy": {"pair":pair
+ *              ,"ord":lastOrder{tradeId,orderId,accountName,currency,open,isBuy,amountK,grossPL,visiblePL}
+ *              , "pips":diff
+ *              ,"closestOrder":closestToCurrentPrice{tradeId,orderId,accountName,currency,open,isBuy,amountK,grossPL,visiblePL}
+ *              ,"closestPips":clsPrDif}
+ *      "sell": {"pair":pair
+ *              ,"ord":lastOrder{tradeId,orderId,accountName,currency,open,isBuy,amountK,grossPL,visiblePL}
+ *              , "pips":diff
+ *              ,"closestOrder":closestToCurrentPrice{tradeId,orderId,accountName,currency,open,isBuy,amountK,grossPL,visiblePL}
+ *              ,"closestPips":clsPrDif}
+ *      "macd":{bias:{macd:(array of macd{}),top_macd,bottom_macd,price_dist,bias}
+ *            ,"closeOrder":1 or 0
+ *            ,"openOrder":1 or 0}
+ *    ,"ma50":ma50[],"ma100":ma100[],"ma200":ma200[]
+ *      ,"bands": {"upper":ExtUpperBuffer[],"lower":ExtLowerBuffer[],"ma":ExtMABuffer[]} 
+ * }
+   */
+  try{
+    console.log(">>>>>>> createOrderTemplate [" + openPos.length + "]>>>>>>>");
+    openPos.forEach((e) =>{
+      if (e.macd.closestOrder)
+      { // this indicate that we must close something
+        if (e.macd.closestOrder == 0 && e.bands.upper[1] )
+        {
+
+        }
+
+      }
+    });
+  }catch (e)
+  {
+    console.log(e);
+  }
+}
 module.exports.macdSignalToEmail = async (openPos) =>
 {
   //let openPos = await this.createOrderTemplate(); 
@@ -346,7 +388,8 @@ module.exports.macdSignalToEmail = async (openPos) =>
  *              ,"closestPips":clsPrDif}
  *      "macd":{bias:{macd:(array of macd{}),top_macd,bottom_macd,price_dist,bias}
  *            ,"closeOrder":1 or 0
- *            ,"openOrder":1 or 0} 
+ *            ,"openOrder":1 or 0}
+ *    ,"ma50":ma50[],"ma100":ma100[],"ma200":ma200[],"bands": {"upper":ExtUpperBuffer,"lower":ExtLowerBuffer,"ma":ExtMABuffer} 
  * }
  */
 module.exports.createOrderTemplate = async () =>{
@@ -361,6 +404,7 @@ module.exports.createOrderTemplate = async () =>{
       let candles = rep.store.get(loadPairs[i].pair);
       candles = JSON.parse(candles);
       let s = await ea.macd_siganal(candles,500);
+      let band = await band_ea.band_siganal(candles);//     await indic.bands(candles,ma12,12);
       let lots = await ords.orderLots(loadPairs[i].pair);
       let ordBuy = await ords.lastOpenOrder(loadPairs[i].pair,true);
       let ordSell = await ords.lastOpenOrder(loadPairs[i].pair,false);
@@ -381,7 +425,8 @@ module.exports.createOrderTemplate = async () =>{
               ,"closeSell_tradeId":ordSell.closestOrder.tradeId
               ,"closeSell_lots":ordSell.closestOrder.amountK
               ,"closeSell_pips":ordSell.closestPips
-              ,"macd":s})
+              ,"macd":s
+            ,"ma50":ma50,"ma100":ma100,"ma200":ma200,"bands":band})
   }
     templateArrays.sort((a,b)=>{
       if(a.pair < b.pair) { return -1; }
