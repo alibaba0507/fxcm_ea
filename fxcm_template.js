@@ -174,8 +174,7 @@ module.exports.bandsSignalToEmail = async(openPos) =>{
  *      "macd":{bias:{macd:(array of macd{}),top_macd,bottom_macd,price_dist,bias}
  *            ,"closeOrder":1 or 0
  *            ,"openOrder":1 or 0}
- *    ,"ma50":ma50[],"ma100":ma100[],"ma200":ma200[]
- *      ,"bands": {"upper":ExtUpperBuffer[],"lower":ExtLowerBuffer[],"ma":ExtMABuffer[]} 
+ *      ,"band": {"type":0 or 1 or -1,"signal":0 or 1} 
  * }
    */
   try{
@@ -426,7 +425,7 @@ module.exports.createOrderTemplate = async () =>{
               ,"closeSell_lots":ordSell.closestOrder.amountK
               ,"closeSell_pips":ordSell.closestPips
               ,"macd":s
-            ,"ma50":ma50,"ma100":ma100,"ma200":ma200,"bands":band})
+            ,"band":band})
   }
     templateArrays.sort((a,b)=>{
       if(a.pair < b.pair) { return -1; }

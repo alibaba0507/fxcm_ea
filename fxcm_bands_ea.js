@@ -40,7 +40,7 @@ module.exports.band_siganal = async (candles)=>{
 
     if (type == 0 && Number(candles[1][rep.candleParams.AskHigh]) > band.upper[1])
     {
-      result.signal = 1;
+      result.signal = 0;
     }
     return result;
 }
