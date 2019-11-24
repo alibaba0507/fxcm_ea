@@ -174,7 +174,7 @@ module.exports.bands = async (candles,maPeriodAsArray,InpBandsDeviations,maPerio
   for (let i = 0;i < pos;i++)
   {
     ExtMABuffer[i] = maPeriodAsArray[i];
-    ExtStdDevBuffer[i]=this.StdDev_Func(i,candles,ExtMABuffer,maPeriod);
+    ExtStdDevBuffer[i]= StdDev_Func(i,candles,ExtMABuffer,maPeriod);
     //--- upper line
     ExtUpperBuffer[i]=ExtMABuffer[i]+InpBandsDeviations*ExtStdDevBuffer[i];
     //--- lower line
