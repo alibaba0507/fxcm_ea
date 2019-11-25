@@ -30,7 +30,15 @@ app.post("/open_order",async (req,res)=>{
    
   //req.url = "/open_orders_291267?ord=";// + JSON.stringify(result);
     //app.handle(req, res);
-    let url = "/open_orders_291267?ord='<b>Redirect From open order form'";
+    let url = "";
+    if (Number(req.body.lots) > 0)
+    {
+      let openResult = await orders.openOrder(req.body.pair,(req.body.type == 1),Number(req.body.lots));
+      //let openResult = {pair:req.body.pair,type:(req.body.type == 1)?"BUY":"SELL"
+       //               ,openAt:price,lots:Number(req.body.lots)} ;
+      url = "/open_orders_291267?ord=" + JSON.stringify(openResult);
+    }
+    //let url = "/open_orders_291267?ord='<b>Redirect From open order form'";
     //app.handle(req, res);
     res.redirect( url);
 } );
@@ -46,7 +54,7 @@ app.post("/open_future",async (req,res)=>{
            url = "/openFuture?pair=" + req.body.pair+ "&type=" + req.body.type 
           + "&lots=" + req.body.lots + "&err='Please Select only Above or Bellow price'";
           //app.handle(req, res);
-         
+          
          }else
          {
           let candles = rep.store.get(req.body.pair);
