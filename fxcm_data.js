@@ -99,7 +99,7 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
               //return {"eer":"No candles for pair [" + loadPairs[indx].pair+"]"};
             }
             jsonCandles = JSON.parse(candles);
-            console.log(' >>>>>>>> loadHistCandles LOADED Count [' + jsonCandles.length  +"]>>>>>>");
+           // console.log(' >>>>>>>> loadHistCandles LOADED Count [' + jsonCandles.length  +"]>>>>>>");
             jsonCandles.sort((a, b) => {
                 return (b[0] - a[0]); // sort decending by time where newest time is first
             });
@@ -132,7 +132,7 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
               }// end if (candles.length < histCandles - 1)
               if (resultInMinutes && Number(resultInMinutes) > 0) { // retreving candles
                 let cmd = '{ "method":"GET", "resource":"/candles/' + loadPairs[indx].id + '/m5", "params": { "num":' + resultInMinutes + ' } }'
-                console.log('>>>>> SENDING ', cmd);
+                console.log('>>>>> UPDATE CANDLES ... ', cmd);
                 let action = store.get('subscribe');
                 if (action)
                   await this.subscibe(true);
@@ -140,14 +140,14 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
                 let result = await conn.authenticate(cmd);
                 if (!result.error && result.data)
                 {
-                  console.log(">>>>> AFTER AUTHENTICATE [" + result.statusCode + "] socket ["
-                  + result.id 
-                  + "] error [" + result.error + "]date len [" + result.data.length  +"]>>>>>");
+                  //console.log(">>>>> AFTER AUTHENTICATE [" + result.statusCode + "] socket ["
+                  //+ result.id 
+                  //+ "] error [" + result.error + "]date len [" + result.data.length  +"]>>>>>");
                    await updateCandles(result.data, jsonCandles, histCandles, loadPairs[indx].pair);
                 }else {
-                  console.log(">>>>> AFTER AUTHENTICATE ERROR socket ["
-                    + result.id 
-                  + "] error [" + result.error + "]>>>>>");
+                 // console.log(">>>>> AFTER AUTHENTICATE ERROR socket ["
+                  //  + result.id 
+                  //+ "] error [" + result.error + "]>>>>>");
 
                   returnResult.err = result.error;
                   returnResult.msg = cmd;
@@ -324,6 +324,6 @@ async function updateCandles (data, jobj, cndlCount, element)  {
     */
     if (element) {
       store.set(element, JSON.stringify(candles));
-      console.log(' ??????????????????????? [' + element + '][' + candles[0] + '][' + candles[1] + '] &&&&&&&&&&&&&&&&&');
+      //console.log(' ??????????????????????? [' + element + '][' + candles[0] + '][' + candles[1] + '] &&&&&&&&&&&&&&&&&');
     }
   }

@@ -495,19 +495,19 @@ module.exports.createOrderTemplate = async () =>{
               ,"lastBuy_tradeId":ordBuy.ord.tradeId
               ,"lastBuy_pips":ordBuy.pips
               ,"lastBuy_lots":ordBuy.ord.amountK
-              ,"lastBuy_grossPl":ordBuy.ord.grossPL
+              ,"lastBuy_grossPl":Number(ordBuy.pips) * Number(loadPairs[i].digits)//ordBuy.ord.grossPL
               ,"lastSell_trendId":ordSell.ord.tradeId
               ,"lastSell_pips":ordSell.pips
               ,"lastSell_lots":ordSell.ord.amountK
-              ,"lastSell_grossPl":ordSell.ord.grossPL
+              ,"lastSell_grossPl":Number(ordSell.pips) * Number(loadPairs[i].digits) //ordSell.ord.grossPL
               ,"closeBuy_tradeId":ordBuy.closestOrder.tradeId
               ,"closeBuy_lots":ordBuy.closestOrder.amountK
               ,"closeBuy_pips":ordBuy.closestPips
-              ,"closeBuy_grossPl":ordBuy.closestOrder.grossPL
+              ,"closeBuy_grossPl":Number(ordBuy.closestPips) * Number(loadPairs[i].digits)//ordBuy.closestOrder.grossPL
               ,"closeSell_tradeId":ordSell.closestOrder.tradeId
               ,"closeSell_lots":ordSell.closestOrder.amountK
               ,"closeSell_pips":ordSell.closestPips
-              ,"closeSell_grossPl":ordSell.closestOrder.grossPL
+              ,"closeSell_grossPl":Number(ordSell.closestPips) * Number(loadPairs[i].digits)//ordSell.closestOrder.grossPL
               ,"macd":s
             ,"band":band})
   }

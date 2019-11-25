@@ -86,7 +86,7 @@ app.get( '/close', async function( req, res ) {
 app.get( '/open_orders_291267', async ( req, res )=> {
   //await require('./fxcm_orders').updateOpenPositions();
   let openPos = await templates.createOrderTemplate();
-  await templates.macdSignalToEmail(openPos);
+ // await templates.macdSignalToEmail(openPos);
   console.log(" >>>>>> get Info ",openPos);
   //let clientData = !{ JSON.stringify(openPos) };
   let ordInfo =  (req.query.ord)? (req.query.ord):"";
@@ -196,7 +196,7 @@ app.get( '/ping', function( req, res ) {
     for (let i = 0;i < trading.length;i++)
     {
         let res = await candles.loadCandles(i,rep.candlesCount);
-        console.log(">>>>>> ##$$$ AFTER CANDLES @###### ",res);
+       // console.log(">>>>>> ##$$$ AFTER CANDLES @###### ",res);
         if (res.err)
         {
           console.log(" ERRRPRRRRRPOOOOORRRR LOAD CANDLE >>>>> SEND EMAIL");
@@ -212,9 +212,11 @@ app.get( '/ping', function( req, res ) {
     console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO PRICE &&&&&&& ");
     candles.subscibe();
     
-    await utils.sleep(2000);
-     orders.subscibeOpenPosition();
+   // await utils.sleep(2000);
+    //console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO OPEN POSSITIONS *************** &&&&&&& ");
+    // orders.subscibeOpenPosition();
      await utils.sleep(2000);
+     console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO CLOSE POSSITIONS ************** &&&&&&& ");
      orders.subscibeClosedPosition();
      await utils.sleep(2000);
     //let openPos = await templates.createOrderTemplate();

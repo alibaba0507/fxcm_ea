@@ -70,7 +70,8 @@ module.exports.OpenPositionListener = async (update) =>{
   try{
     var jsonData = JSON.parse(update);
     if (!jsonData.tradeId || jsonData.isTotal == true){return;}
-    //console.log('  UPDATE OPEN POSSITIONS ',jsonData);
+   // console.log('  UPDATE OPEN POSSITIONS ',jsonData);
+    
     let store_open_pos = store.get(rep.storeKey.open_possitions);
     if (store_open_pos && Array.isArray(JSON.parse(store_open_pos)))
     {
@@ -90,7 +91,7 @@ module.exports.OpenPositionListener = async (update) =>{
                     pos.grossPL = jsonData.grossPL;
                     pos.close = jsonData.close;
                     pos.visiblePL = jsonData.visiblePL;
-                store.set(store.storeKey.open_possitions,JSON.stringify(store_open_pos));
+                store.set(rep.storeKey.open_possitions,JSON.stringify(store_open_pos));
             }// end if (pos.grossPL != jsonData.grossPL)
         }//end if (pos)
         else
@@ -133,6 +134,7 @@ module.exports.OpenPositionListener = async (update) =>{
         */
        store.set("updateOpenPosition",1);
     }
+    
   }catch (e)
   {
    console.log("Error OpenPosition[" + e.stack + "]");
@@ -196,8 +198,10 @@ module.exports.subscibeOpenPosition = async (unsubscribe = false) =>{
                         
                     });
                 }
-            }else
-                throw new Error("Error status[" + statusCode + "][" + err  +"]"); //inside callback 
+            }else{
+                store.set("subscibeOpenPosition","0");
+                //throw new Error("Error status[" + statusCode + "][" + err  +"]"); //inside callback 
+            }
         }catch (e)
         {
             store.set("subscibeOpenPosition","0");
@@ -241,8 +245,10 @@ module.exports.subscibeClosedPosition = async () =>{
                         
                     });
                 }
-            }else
-                throw new Error("Error status[" + statusCode + "][" + err  +"]"); //inside callback 
+            }else{
+                store.set("subscibeClosedPosition","0");
+               // throw new Error("Error status[" + statusCode + "][" + err  +"]"); //inside callback 
+            }
         }catch (e)
         {
             store.set("subscibeClosedPosition","0");

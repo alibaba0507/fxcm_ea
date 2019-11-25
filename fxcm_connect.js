@@ -35,7 +35,7 @@ module.exports.authenticate = async (command,callback,indx=0) =>{
 			store.config.token = require('fs').readFileSync('token.txt').toString();
 			store.config.token = store.config.token.split(/\r?\n/)[0]; // need only first line
 		}
-		console.log(" ######## TOLEN [" + store.config.token + '][' +command+'] #########' );
+		//console.log(" ######## TOLEN [" + store.config.token + '][' +command+'] #########' );
 		 socket = io(store.config.trading_api_proto + '://' + store.config.trading_api_host + ':' + store.config.trading_api_port, 
 		{
 			
@@ -52,30 +52,32 @@ module.exports.authenticate = async (command,callback,indx=0) =>{
 		}
 		// fired when socket.io connects with no errors
 		socket.on('connect', () => {
-			console.log('Socket.IO session has been opened: ', socket.id);
-			console.log('@@@@@@@ OPEN SOCKET ',command);
+			console.log(' **** Socket.IO ID[' + socket.id + ']token[' + store.config.token + ']' + command);
+			//console.log('@@@@@@@ OPEN SOCKET ',command);
 			request_headers.Authorization = 'Bearer ' + socket.id + store.config.token;
 			processData(command,callback,indx,socket);
 		});
 		
 		// fired when socket.io cannot connect (network errors)
 		socket.on('connect_error', (error) => {
-			console.log('Socket.IO session connect error: ', error);
-			console.log('@@@@@@@ SOCKET ERROR ',command);
+			console.error(' CONNECT ERROR[' + error + '] Socket.IO ID[' + socket.id + ']token[' + store.config.token + ']' + command);
+			//console.log('Socket.IO session connect error: ', error);
+			//console.log('@@@@@@@ SOCKET ERROR ',command);
 			//mail('Fxcm Alert Socket IO Error',error)
 			callback(0,0,'',error);
 
 		});
 		// fired when socket.io cannot connect (login errors)
 		socket.on('error', (error) => {
-			console.log('Socket.IO session error: ', error);
-			console.log('@@@@@@@ SOCKET ERROR ',command);
+			console.error(' ERROR[' + error + '] Socket.IO ID[' + socket.id + ']token[' + store.config.token + ']' + command);
+			//console.log('@@@@@@@ SOCKET ERROR ',command);
 			callback(0,0,'',error);
 		});
 		// fired when socket.io disconnects from the server
 		socket.on('disconnect', () => {
-			console.log('Socket disconnected, terminating client.');
-			console.log('@@@@@@@ SOCKET DISCONECT ',command);
+			console.error(' *** DISCONNECT Socket token[' + store.config.token + ']' + command);
+			//console.log('Socket disconnected, terminating client.');
+			//console.log('@@@@@@@ SOCKET DISCONECT ',command);
 			store.mail("FXCM Socket ERROR",'@@@@@@@ SOCKET DISCONECT '+ command)
 			//process.exit(-1);
 			callback(0,0,'','Socket disconnected, terminating client');
@@ -92,8 +94,8 @@ async function socketProccess(command , socket,indx)
 {
   return new Promise((resolve, reject) => {
 	socket.on('connect', () => {
-		console.log('Socket.IO session has been opened: ', socket.id);
-		console.log('@@@@@@@ OPEN AWAIT SOCKET ',command);
+		//console.log('Socket.IO session has been opened: ', socket.id);
+		console.log('@@@@@@@ OPEN AWAIT SOCKET id[' + socket.id + ']' + command);
 		request_headers.Authorization = 'Bearer ' + socket.id + store.config.token;
 		processData(command,(statusCode,reqId,data,err,indx)=>{
 			resolve( {"statusCode":statusCode,"reqId":reqId
@@ -159,7 +161,7 @@ function processData(data,callback,indx,socket)
                 //	console.log(" >>>>>>>>>>>>> SENDING ",params);
           var jPrams = JSON.parse(params);
                         //jPrams.callback = callback;
-                        console.log(" >>>>>>>>>>>>> SENDING ",jPrams);
+                       // console.log(" >>>>>>>>>>>>> SENDING ",jPrams);
            send(jPrams,callback,indx,socket);    
     } catch (e) {
             console.log('could not parse JSON parameters: ', e);
@@ -216,7 +218,7 @@ function request_processor (method, resource, params, callback,indx,socket) {
 	if (method === "GET") {
 		resource += '/?' + params;
 	}
-	console.log(" +++++++++++++++ URL ",resource);
+	//console.log(" +++++++++++++++ URL ",resource);
 	var req = tradinghttp.request({
 			host: store.config.trading_api_host,
 			port: store.config.trading_api_port,
@@ -233,10 +235,11 @@ function request_processor (method, resource, params, callback,indx,socket) {
                     callback(response.statusCode, requestID, '',jObj.error,indx,socket);
                 }else
                     callback(response.statusCode, requestID, data,null,indx,socket);
-                console.log(' ++++++++++ After CallBack ++++++++++++');
+               // console.log(' ++++++++++ After CallBack ++++++++++++');
 				
 			});
 		}).on('error', (err) => {
+			console.error(" REQUEST ERR [" + err + "]");
 			//mail('Fxcm request Error [' + params + '] - ',err)
            // if (typeof(callback) !== 'undefined') 
 			//{
@@ -249,11 +252,11 @@ function request_processor (method, resource, params, callback,indx,socket) {
 	if (method !== "GET" && typeof(params) != 'undefined') {
 		req.write(params);
 	}
-	console.log('  $$$$$$$$$$$ END OF REQ BEFORE CLOSING &&&&&&&');
+	//console.log('  $$$$$$$$$$$ END OF REQ BEFORE CLOSING &&&&&&&');
 	req.end();
 } catch (e) {
 	  //mail('Fxcm request Error [' + params + '] - ',e)
-     console.log(e);
+     console.error(e);
      callback(0, requestID, e);
 }
 }
