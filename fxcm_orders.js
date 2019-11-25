@@ -345,18 +345,18 @@ module.exports.openOrder = async (pair,isBuy,lots) =>{
 
 module.exports.openPendingPossition = async (pair,priceAt,isBuy,lots) =>{
     let cmd = ' { "method":"POST", "resource":"/trading/create_entry_order",'
-    +' "params": { "account_id":' + rep.config.fxcm_acc  
-     + ', "symbol":' + pair 
+    +' "params": { "account_id":"' + rep.config.fxcm_acc + '"'  
+     + ', "symbol":"' + pair + '"'
      + ', "is_buy":' + isBuy 
      + ', "rate":' + Number(priceAt) 
      + ', "amount":' + Number(lots) + ' } }';
      let ord_data = await conn.authenticate(cmd);
      if (ord_data.data)
      {
-         console.log(">>>>>>> AFTER OPEN PENDING POSITION [" + (ord_data.data.executed ? "SUCCESS":"FAIL") + "]");
-         console.log(ord_data);
+         console.log(">>>>>>> AFTER OPEN PENDING POSITION [" + (ord_data.statusCode == 200 ? "SUCCESS":"FAIL") + "]");
+         console.log(ord_data.data);
      }
-     return ord_data;
+     return ord_data.data;
 }
 
 /**

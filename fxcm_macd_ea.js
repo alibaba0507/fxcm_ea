@@ -88,7 +88,8 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
   }
   let result = {};
   result.bias = biasMacd.bias;
-  result.bias_min = await this.macd_bias(candles,50,startFrom,tf);
+  let bias_min =await this.macd_bias(candles,50,startFrom,tf);
+  result.bias_min = bias_min.bias;
  // if (Number(biasMacd.bias) == 1)
  // { // buy bias
     if (Number(res.macd.main[1]) > Number(res.top_macd) * 1.61
