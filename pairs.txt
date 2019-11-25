@@ -1,8 +1,1 @@
-{"update":false,"minLots":"3","maxLots":"12"
-,"trading":"[{\"pair\":\"EUR/USD\",\"id\":\"1\",\"closeProf\":\"1\",'digits':100000}
-,{\"pair\":\"GBP/USD\",\"id\":\"3\",\"closeProf\":\"1\",'digits':100000}
-,{\"pair\":\"EUR/GBP\",\"id\":\"9\",\"closeProf\":\"1\",'digits':100000}
-,{\"pair\":\"GBP/AUD\",\"id\":\"22\",\"closeProf\":\"1\",'digits':100000}
-,{\"pair\":\"GBP/JPY\",\"id\":\"11\",\"closeProf\":\"1\",'digits':100}
-,{\"pair\":\"EUR/AUD\",\"id\":\"14\",\"closeProf\":\"1\",'digits':100000}
-,{\"pair\":\"EUR/JPY\",\"id\":\"10\",\"closeProf\":\"1\",'digits':100}]"}
+{"update":false,"minLots":"3","maxLots":"12","trading":"[{\"pair\":\"EUR/USD\",\"id\":\"1\",\"closeProf\":\"1\",\"digits\":\"100000\"},{\"pair\":\"GBP/USD\",\"id\":\"3\",\"closeProf\":\"1\",\"digits\":\"100000\"},{\"pair\":\"EUR/GBP\",\"id\":\"9\",\"closeProf\":\"1\",\"digits\":\"100000\"},{\"pair\":\"GBP/AUD\",\"id\":\"22\",\"closeProf\":\"1\",\"digits\":\"100000\"},{\"pair\":\"GBP/JPY\",\"id\":\"11\",\"closeProf\":\"1\",\"digits\":\"100\"},{\"pair\":\"EUR/AUD\",\"id\":\"14\",\"closeProf\":\"1\",\"digits\":\"100000\"},{\"pair\":\"EUR/JPY\",\"id\":\"10\",\"closeProf\":\"1\",\"digits\":\"100\"}]"}

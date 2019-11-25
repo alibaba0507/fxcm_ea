@@ -255,7 +255,7 @@ module.exports.bandsSignalToEmail = async(openPos) =>{
 
     if (rows.length)
   {
-    let htmlEmailBody = "New Signals for pairs: <br>"
+    let htmlEmailBody = "New BAND Signals for pairs: <br>"
     + "<a href=\"" + rep.config.server_url + "/open_orders_291267" + "\">Check Orders Online</a><br>" 
     + "<table><tr><th>Pairs</th><th>Bias</th><th>Lots</th><th>Last Buy Order</th>"
     + "<th>Closest BUY</th><th>Last Sell Order</th><th>Closest SELL</th></tr>";
@@ -269,7 +269,7 @@ module.exports.bandsSignalToEmail = async(openPos) =>{
     }
     htmlEmailBody += "</table>";
     console.log(">>>>>> #### SENDIGN EMAIL ALERT ######$$$>>>>>");
-    rep.mail('FXCM EA Alert',htmlEmailBody);
+    rep.mail('FXCM EA BAND Alert',htmlEmailBody);
   }
   }catch (e)
   {
@@ -433,7 +433,7 @@ module.exports.macdSignalToEmail = async (openPos) =>
   });//end openPos.forEach((e) =>{
   if (rows.length)
   {
-    let htmlEmailBody = "New Signals for pairs: <br>"
+    let htmlEmailBody = "New MACD Signals for pairs: <br>"
     + "<a href=\"" + rep.config.server_url + "/open_orders_291267s" + "\">Check Orders Online</a><br>" 
     + "<table><tr><th>Pairs</th><th>Bias</th><th>Lots</th><th>Last Buy Order</th><th>Last Sell Order</th></tr>";
     for (let i = 0;i < rows.length;i++)
@@ -446,7 +446,7 @@ module.exports.macdSignalToEmail = async (openPos) =>
     }
     htmlEmailBody += "</table>";
     console.log(">>>>>> #### SENDIGN EMAIL ALERT ######$$$>>>>>");
-    rep.mail('FXCM EA Alert',htmlEmailBody);
+    rep.mail('FXCM EA MACD Alert',htmlEmailBody);
   }
   }catch(e)
   {

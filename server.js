@@ -156,7 +156,7 @@ app.get( '/ping', function( req, res ) {
         });
     }
     if ((new Date().getMinutes() % 5) == 0) {
-     
+      rep.store.set("updateOpenPosition",1);
       await updateCandles();  
       //await templates.checkForEmailSignal();
       //await templates.macdSignalToEmail();
@@ -219,8 +219,9 @@ app.get( '/ping', function( req, res ) {
      console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO CLOSE POSSITIONS ************** &&&&&&& ");
      orders.subscibeClosedPosition();
      await utils.sleep(2000);
-    //let openPos = await templates.createOrderTemplate();
+    let openPos = await templates.createOrderTemplate();
     //await templates.macdSignalToEmail(openPos);
+    await templates.bandsSignalToEmail(openPos);
     //await macd();
     
    //rep.mail('FXCM Test mail',"<b> This is is a test");
