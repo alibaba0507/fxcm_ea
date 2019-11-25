@@ -35,6 +35,47 @@ app.post("/open_order",async (req,res)=>{
     res.redirect( url);
 } );
 
+app.post("/open_future",async (req,res)=>{
+   
+  //req.url = "/open_orders_291267?ord=";// + JSON.stringify(result);
+    //app.handle(req, res);
+    if (Number(req.body.abovePrice) > 0 
+         && Number(req.body.bellowPrice) > 0)
+         {
+          let url = "/openFuture?pair=" + req.body.pair+ "&type=" + req.body.type 
+          + "&lots=" + req.body.lots + "&err='Please Select only Above or Bellow price'";
+          //app.handle(req, res);
+          res.redirect( url);
+         }else
+         {
+          let candles = rep.store.get(req.body.pair);
+          if (candles)
+          {
+            jsonCandles = JSON.parse(candles);
+           // console.log(' >>>>>>>> loadHistCandles LOADED Count [' + jsonCandles.length  +"]>>>>>>");
+            jsonCandles.sort((a, b) => {
+                return (b[0] - a[0]); // sort decending by time where newest time is first
+            });
+         
+          let loadPairs = rep.store.get(rep.storeKey.trading);
+          loadPairs = JSON.parse(loadPairs);
+          let p = loadPairs.find((e)=>{return e.pair == req.body.pair});
+          let price = (req.body.type == 1) ? 
+                Number(jsonCandles[0][rep.candleParams.AskClose])
+                : Number(jsonCandles[0][rep.candleParams.BidClose])
+          if (Number(req.body.abovePrice))
+                 price +=  (Number(req.body.abovePrice) / Number(p.digits));
+          if (Number(req.body.bellowPrice))
+                 price -=  (Number(req.body.bellowPrice) / Number(p.digits));
+           await orders.openPendingPossition(req.body.pair,price,(type == 1),Number(req.body.lots));
+         }
+        }
+    let url = "/open_orders_291267?ord='<b>Redirect From open order form'";
+    //app.handle(req, res);
+    res.redirect( url);
+} );
+
+
 app.post("/update_token", async (req,res)=>{
   try{
    if (req.body.token)
@@ -110,8 +151,15 @@ app.get( '/ping', function( req, res ) {
   });
 
   app.get( '/openFuture', function( req, res ) {
-    console.log(' >>>>>>> Calling Ping Server ....');
-    res.send(' <b> Ping Success .....');
+    let err = "";
+    if (req.query.err)
+     err = req.query.err;
+    return res.render( 'openFutureForm.html',{
+      pair:req.query.pair,
+      type:req.query.type,
+      lots:rep.config.minLot,
+      err:err
+  });
   });
 
 
