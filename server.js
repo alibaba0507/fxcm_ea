@@ -223,7 +223,7 @@ app.get( '/ping', function( req, res ) {
       rep.store.set("updateOpenPosition",1);
       await updateCandles();  
       //await templates.checkForEmailSignal();
-      //await templates.macdSignalToEmail();
+     // await templates.macdSignalToEmail();
     }
   });
  
@@ -284,7 +284,7 @@ app.get( '/ping', function( req, res ) {
      orders.subscibeClosedPosition();
      await utils.sleep(2000);
     let openPos = await templates.createOrderTemplate();
-    //await templates.macdSignalToEmail(openPos);
+    await templates.macdSignalToEmail(openPos);
     //await templates.bandsSignalToEmail(openPos);
     //await macd();
     
