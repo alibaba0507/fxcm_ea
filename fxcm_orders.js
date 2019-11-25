@@ -80,7 +80,7 @@ module.exports.OpenPositionListener = async (update) =>{
        
         if (pos)
         {
-            console.log("///%%%%%%%%%%%%%%   #$$##$$$ ",pos);
+           // console.log("///%%%%%%%%%%%%%%   #$$##$$$ ",pos);
             if (pos.grossPL != jsonData.grossPL)
             {
             //	console.log('>>>>>>>> OPEN POS has Canged[' + pos.currency + '] [' 
@@ -89,8 +89,8 @@ module.exports.OpenPositionListener = async (update) =>{
                 //	hasChange = true;
                     pos.grossPL = jsonData.grossPL;
                     pos.close = jsonData.close;
-                pos.visiblePL = jsonData.visiblePL;
-                store.store.set(store.storeKey.open_possitions,JSON.stringify(store_open_pos));
+                    pos.visiblePL = jsonData.visiblePL;
+                store.set(store.storeKey.open_possitions,JSON.stringify(store_open_pos));
             }// end if (pos.grossPL != jsonData.grossPL)
         }//end if (pos)
         else

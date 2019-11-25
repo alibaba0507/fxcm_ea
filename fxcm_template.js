@@ -283,7 +283,7 @@ module.exports.macdSignalToEmail = async (openPos) =>
   try{
   console.log(">>>>>>> createOrderTemplate [" + openPos.length + "]>>>>>>>");
   let d = new Date();
-  openPos.forEach((e) =>{
+  openPos.forEach(async (e) =>{
     //let row = [];
     let cells =[];
     let pair  =  e.pair.replace(/([^a-z0-9]+)/gi, '');
