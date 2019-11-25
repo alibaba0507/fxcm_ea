@@ -33,14 +33,18 @@ module.exports.band_siganal = async (candles)=>{
       
     }// end for
     let result = {"type":type}
-    if (type == 1 && Number(candles[1][rep.candleParams.BidLow]) < band.lower[1])
-    {
-      result.signal = 1;
-    }
+    //if (type == 1 && Number(candles[1][rep.candleParams.BidLow]) < band.lower[1])
+    //{
+    //  result.signal = 1;
+    //}
 
-    if (type == 0 && Number(candles[1][rep.candleParams.AskHigh]) > band.upper[1])
-    {
-      result.signal = 0;
-    }
+    //if (type == 0)
+   // {
+      if ( Number(candles[1][rep.candleParams.AskHigh]) > band.upper[1])
+        result.signal = 0;
+      if (Number(candles[1][rep.candleParams.BidLow]) < band.lower[1])
+        result.signal = 1;
+
+    //}
     return result;
 }

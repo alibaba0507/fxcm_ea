@@ -27,7 +27,7 @@
                                 {% else %}
                                 <font color="green">{{ item.lastBuy_pips | round(5) }}</font>
                                 {% endif %}
-                                -- L({{ item.lastBuy_lots}}) 
+                                -- L({{ item.lastBuy_lots}})  -- $({{item.lastBuy_grossPl | round(2)}})
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <a href="/close?tradeId={{ item.lastBuy_tradeId }}">X</a>
                         </td>
@@ -37,7 +37,7 @@
                                 {% else %}
                                 <font color="green">{{ item.lastSell_pips | round(5) }}</font>
                                 {% endif %}
-                                -- L({{ item.lastSell_lots}})
+                                -- L({{ item.lastSell_lots}}) -- $({{item.lastSell_grossPl | round(2)}})
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <a href="/close?tradeId={{ item.lastSell_tradeId }}">X</a>
                         </td>
@@ -47,7 +47,7 @@
                                 {% else %}
                                 <font color="green">{{ item.closeBuy_pips | round(5) }}</font>
                                 {% endif %}
-                                -- L({{ item.closeBuy_lots}})
+                                -- L({{ item.closeBuy_lots}})-- $({{item.closeBuy_grossPl | round(2)}})
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <a href="/close?tradeId={{ item.closeBuy_tradeId }}">X</a>
                         </td>
@@ -57,7 +57,7 @@
                                 {% else %}
                                 <font color="green">{{ item.closeSell_pips | round(5) }}</font>
                                 {% endif %}
-                                -- L({{ item.closeSell_lots}})
+                                -- L({{ item.closeSell_lots}}) -- $({{item.closeSell_grossPl | round(2)}})
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <a href="/close?tradeId={{ item.lastSell_tradeId }}">X</a>
                         </td>

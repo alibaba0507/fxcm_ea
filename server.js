@@ -217,8 +217,8 @@ app.get( '/ping', function( req, res ) {
      await utils.sleep(2000);
      orders.subscibeClosedPosition();
      await utils.sleep(2000);
-    let openPos = await templates.createOrderTemplate();
-    await templates.macdSignalToEmail(openPos);
+    //let openPos = await templates.createOrderTemplate();
+    //await templates.macdSignalToEmail(openPos);
     //await macd();
     
    //rep.mail('FXCM Test mail',"<b> This is is a test");

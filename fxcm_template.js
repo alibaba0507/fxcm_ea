@@ -159,36 +159,118 @@ module.exports.bandsSignalToEmail = async(openPos) =>{
   /***********************************************************************8
    * 
    * @returns array of {
- *     "pair",
- *      "lots":{"pair","buy","sell"},
- *     "buy": {"pair":pair
- *              ,"ord":lastOrder{tradeId,orderId,accountName,currency,open,isBuy,amountK,grossPL,visiblePL}
- *              , "pips":diff
- *              ,"closestOrder":closestToCurrentPrice{tradeId,orderId,accountName,currency,open,isBuy,amountK,grossPL,visiblePL}
- *              ,"closestPips":clsPrDif}
- *      "sell": {"pair":pair
- *              ,"ord":lastOrder{tradeId,orderId,accountName,currency,open,isBuy,amountK,grossPL,visiblePL}
- *              , "pips":diff
- *              ,"closestOrder":closestToCurrentPrice{tradeId,orderId,accountName,currency,open,isBuy,amountK,grossPL,visiblePL}
- *              ,"closestPips":clsPrDif}
- *      "macd":{bias:{macd:(array of macd{}),top_macd,bottom_macd,price_dist,bias}
- *            ,"closeOrder":1 or 0
- *            ,"openOrder":1 or 0}
- *      ,"band": {"type":0 or 1 or -1,"signal":0 or 1} 
- * }
+   "lotsBuy":lots.buy,"lotsSell":lots.sell
+              ,"lastBuy_tradeId":ordBuy.ord.tradeId
+              ,"lastBuy_pips":ordBuy.pips
+              ,"lastBuy_lots":ordBuy.ord.amountK
+              ,"lastBuy_grossPl":ordBuy.ord.grossPL
+              ,"lastSell_trendId":ordSell.ord.tradeId
+              ,"lastSell_pips":ordSell.pips
+              ,"lastSell_lots":ordSell.ord.amountK
+              ,"lastSell_grossPl":ordSell.ord.grossPL
+              ,"closeBuy_tradeId":ordBuy.closestOrder.tradeId
+              ,"closeBuy_lots":ordBuy.closestOrder.amountK
+              ,"closeBuy_pips":ordBuy.closestPips
+              ,"closeBuy_grossPl":ordBuy.closestOrder.grossPL
+              ,"closeSell_tradeId":ordSell.closestOrder.tradeId
+              ,"closeSell_lots":ordSell.closestOrder.amountK
+              ,"closeSell_pips":ordSell.closestPips
+              ,"closeSell_grossPl":ordSell.closestOrder.grossPL
+              ,"macd":s
+            ,"band":band})
    */
+  let rows = [];
   try{
     console.log(">>>>>>> createOrderTemplate [" + openPos.length + "]>>>>>>>");
     openPos.forEach((e) =>{
-      if (e.macd.closestOrder)
-      { // this indicate that we must close something
-        if (e.macd.closestOrder == 0 && e.bands.upper[1] )
-        {
-
-        }
-
+      let cells =[];
+      
+      if (e.macd.closestOrder == 0 /*&& e.band.type == 0*/ && e.band.signal == 1 )
+      {
+        cells.push(e.pair);
+        cells.push("MACD(" +(Number(e.macd.bias) == 1 ? "BUY" : 
+                          Number(e.macd.bias == 0?"SELL":"NA") )  + ")"
+                            + "BAND(" + (Number(e.band.type == 1) ? "BUY":
+                              Number(e.band.type == 0)?"SELL":"NA") + 
+                              ") CLOSE SELL");
       }
+      if (e.macd.closestOrder == 1 /*&& e.band.type == 0*/ && e.band.signal == 0 )
+      {
+        cells.push(e.pair);
+        cells.push("MACD(" +(Number(e.macd.bias) == 1 ? "BUY" : 
+                          Number(e.macd.bias == 0?"SELL":"NA") )  + ")"
+                            + "BAND(" + (Number(e.band.type == 1) ? "BUY":
+                              Number(e.band.type == 0)?"SELL":"NA") + 
+                              ") CLOSE BUY");
+      }
+      if (e.macd.closestOrder != 1  && e.band.type == 1 && e.band.signal == 1 )
+      {
+        cells.push(e.pair);
+        cells.push("MACD(" +(Number(e.macd.bias) == 1 ? "BUY" : 
+                          Number(e.macd.bias == 0?"SELL":"NA") )  + ")"
+                            + "BAND(" + (Number(e.band.type == 1) ? "BUY":
+                              Number(e.band.type == 0)?"SELL":"NA") + 
+                              ") OPEN BUY");
+      }
+      
+
+      if (e.macd.closestOrder != 0  && e.band.type == 0 && e.band.signal == 0 )
+      {
+        cells.push(e.pair);
+        cells.push("MACD(" +(Number(e.macd.bias) == 1 ? "BUY" : 
+                          Number(e.macd.bias == 0?"SELL":"NA") )  + ")"
+                            + "BAND(" + (Number(e.band.type == 1) ? "BUY":
+                              Number(e.band.type == 0)?"SELL":"NA") + 
+                              ") OPEN SELL");
+      }
+
+      if (cells.length > 0)
+      { // add the rest if there is a signal
+          cells.push("<font color=\"green\">BUY(" + e.lotsBuy + ")</font>--"
+          + "<font color=\"red\">SELL(" + e.lotsSell + ")</font>--"); 
+          cells.push("<font color=\"" + ((Number(e.lastBuy_pips) < 0)?"red":"green")  + "\">("
+                  + parseFloat(e.lastBuy_pips).toFixed(5) + ")$("
+                  + parseFloat(e.lastBuy_grossPl).toFixed(2) + ")</font>"
+          + "-- L("  + e.lastBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+          + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.lastBuy_tradeId + "\">X</a> ");
+          cells.push("<font color=\"" + ((Number(e.closeBuy_pips) < 0)?"red":"green")  + "\">("
+          + parseFloat(e.closeBuy_pips).toFixed(5) + ")$("
+          + parseFloat(e.closeBuy_grossPl).toFixed(2) + ")</font>"
+          + "-- L("  + e.closeBuy_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+          + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.closeBuy_tradeId + "\">X</a> ");
+
+          cells.push("<font color=\"" + ((Number(e.lastSell_pips) < 0)?"red":"green")  + "\">("
+          + parseFloat(e.lastSll_pips).toFixed(5) + ")$("
+          + parseFloat(e.lastSll_grossPl).toFixed(2) + ")</font>"
+          + "-- L("  + e.lastSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+          + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.lastSell_tradeId + "\">X</a> ");
+          cells.push("<font color=\"" + ((Number(e.closeSell_pips) < 0)?"red":"green")  + "\">("
+          + parseFloat(e.closeSell_pips).toFixed(5) + ")$("
+          + parseFloat(e.closeSell_grossPl).toFixed(2) + ")</font>"
+          + "-- L("  + e.closeSell_lots + ")&nbsp;&nbsp;&nbsp;&nbsp;"
+          + "<a href=\"" + rep.config.server_url + "/close?tradeId=" + e.closeSell_tradeId + "\">X</a> ");
+          rows.push(cells);
+      }//end if  if (cells.length > 0)
     });
+
+    if (rows.length)
+  {
+    let htmlEmailBody = "New Signals for pairs: <br>"
+    + "<a href=\"" + rep.config.server_url + "/open_orders_291267" + "\">Check Orders Online</a><br>" 
+    + "<table><tr><th>Pairs</th><th>Bias</th><th>Lots</th><th>Last Buy Order</th>"
+    + "<th>Closest BUY</th><th>Last Sell Order</th><th>Closest SELL</th></tr>";
+    for (let i = 0;i < rows.length;i++)
+    {
+      let c = rows[i];
+      htmlEmailBody += "<tr>";
+      for (let k = 0;i < c.length;k++)
+       htmlEmailBody += "<td>" + c[k] + "</td>";
+      htmlEmailBody += "</tr>";
+    }
+    htmlEmailBody += "</table>";
+    console.log(">>>>>> #### SENDIGN EMAIL ALERT ######$$$>>>>>");
+    rep.mail('FXCM EA Alert',htmlEmailBody);
+  }
   }catch (e)
   {
     console.log(e);
@@ -421,9 +503,11 @@ module.exports.createOrderTemplate = async () =>{
               ,"closeBuy_tradeId":ordBuy.closestOrder.tradeId
               ,"closeBuy_lots":ordBuy.closestOrder.amountK
               ,"closeBuy_pips":ordBuy.closestPips
+              ,"closeBuy_grossPl":ordBuy.closestOrder.grossPL
               ,"closeSell_tradeId":ordSell.closestOrder.tradeId
               ,"closeSell_lots":ordSell.closestOrder.amountK
               ,"closeSell_pips":ordSell.closestPips
+              ,"closeSell_grossPl":ordSell.closestOrder.grossPL
               ,"macd":s
             ,"band":band})
   }
