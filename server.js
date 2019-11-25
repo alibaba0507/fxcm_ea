@@ -39,13 +39,14 @@ app.post("/open_future",async (req,res)=>{
    
   //req.url = "/open_orders_291267?ord=";// + JSON.stringify(result);
     //app.handle(req, res);
+    let url = "";
     if (Number(req.body.abovePrice) > 0 
          && Number(req.body.bellowPrice) > 0)
          {
-          let url = "/openFuture?pair=" + req.body.pair+ "&type=" + req.body.type 
+           url = "/openFuture?pair=" + req.body.pair+ "&type=" + req.body.type 
           + "&lots=" + req.body.lots + "&err='Please Select only Above or Bellow price'";
           //app.handle(req, res);
-          res.redirect( url);
+         
          }else
          {
           let candles = rep.store.get(req.body.pair);
@@ -67,12 +68,17 @@ app.post("/open_future",async (req,res)=>{
                  price +=  (Number(req.body.abovePrice) / Number(p.digits));
           if (Number(req.body.bellowPrice))
                  price -=  (Number(req.body.bellowPrice) / Number(p.digits));
-           await orders.openPendingPossition(req.body.pair,price,(type == 1),Number(req.body.lots));
-         }
+          let openResult = await orders.openPendingPossition(req.body.pair,price,(type == 1),Number(req.body.lots));
+            url = "/open_orders_291267?ord=" + JSON.stringify(openResult);
+          //app.handle(req, res);
+          
+          }else
+          {
+            url = "/open_orders_291267?ord='Can not FIND CANDLE DATA for [" + req.body.pair + "] '";
+          }
         }
-    let url = "/open_orders_291267?ord='<b>Redirect From open order form'";
-    //app.handle(req, res);
-    res.redirect( url);
+        res.redirect( url);
+   
 } );
 
 
