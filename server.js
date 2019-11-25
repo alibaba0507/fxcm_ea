@@ -69,7 +69,7 @@ app.post("/open_future",async (req,res)=>{
           if (Number(req.body.bellowPrice))
                  price -=  (Number(req.body.bellowPrice) / Number(p.digits));
           //let openResult = await orders.openPendingPossition(req.body.pair,price,(type == 1),Number(req.body.lots));
-          let openResult = {pair:req.body.pair,type:(type == 1)?"BUY":"SELL"
+          let openResult = {pair:req.body.pair,type:(req.body.type == 1)?"BUY":"SELL"
                           ,openAt:price,lots:Number(req.body.lots)} ;
           url = "/open_orders_291267?ord=" + JSON.stringify(openResult);
           //app.handle(req, res);
@@ -277,7 +277,7 @@ app.get( '/ping', function( req, res ) {
      await utils.sleep(2000);
     let openPos = await templates.createOrderTemplate();
     //await templates.macdSignalToEmail(openPos);
-    await templates.bandsSignalToEmail(openPos);
+    //await templates.bandsSignalToEmail(openPos);
     //await macd();
     
    //rep.mail('FXCM Test mail',"<b> This is is a test");
