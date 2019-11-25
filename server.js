@@ -68,8 +68,10 @@ app.post("/open_future",async (req,res)=>{
                  price +=  (Number(req.body.abovePrice) / Number(p.digits));
           if (Number(req.body.bellowPrice))
                  price -=  (Number(req.body.bellowPrice) / Number(p.digits));
-          let openResult = await orders.openPendingPossition(req.body.pair,price,(type == 1),Number(req.body.lots));
-            url = "/open_orders_291267?ord=" + JSON.stringify(openResult);
+          //let openResult = await orders.openPendingPossition(req.body.pair,price,(type == 1),Number(req.body.lots));
+          let openResult = {pair:req.body.pair,type:(type == 1)?"BUY":"SELL"
+                          ,openAt:price,lots:Number(req.body.lots)} ;
+          url = "/open_orders_291267?ord=" + JSON.stringify(openResult);
           //app.handle(req, res);
           
           }else
