@@ -337,10 +337,10 @@ module.exports.openOrder = async (pair,isBuy,lots) =>{
      let ord_data = await conn.authenticate(cmd);
      if (ord_data.data)
      {
-         console.log(">>>>>>> AFTER OPEN ORDER [" + (ord_data.data.executed ? "SUCCESS":"FAIL") + "]");
-         console.log(ord_data);
+         console.log(">>>>>>> AFTER OPEN ORDER [" + (ord_data.statusCode == 200 ? "SUCCESS":"FAIL") + "]");
+         console.log(ord_data.data);
      }
-     return ord_data;
+     return ord_data.data;
 }
 
 module.exports.openPendingPossition = async (pair,priceAt,isBuy,lots) =>{
