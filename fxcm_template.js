@@ -337,7 +337,7 @@ module.exports.macdSignalToEmail = async (openPos) =>
       }
     }
     */
-    console.log(" >>>>>>>>>>>>> PARSE ELEMENT ",e);
+    console.log(" >>>>>>>>>>>>> PARSE ELEMENT [" + e.pair + "]",e.macd);
     if (e.macd)
     {
       if (typeof e.macd.closestOrder !== 'undefined')
