@@ -281,11 +281,14 @@ app.get( '/ping', function( req, res ) {
     //console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO OPEN POSSITIONS *************** &&&&&&& ");
     // orders.subscibeOpenPosition();
      await utils.sleep(2000);
-     console.log(" >>>>>>> $$$$$ BEOFRE SUPSCRIBE TO CLOSE POSSITIONS ************** &&&&&&& ");
+     
      orders.subscibeClosedPosition();
      await utils.sleep(2000);
-    let openPos = await templates.createOrderTemplate();
+     console.log(" >>>>>>> $$$$$ BEOFRE createOrderTemplate() ************** &&&&&&& ");
+     let openPos = await templates.createOrderTemplate();
+     console.log(" >>>>>>> $$$$$ BEOFRE macdSignalToEmail() ************** &&&&&&& ");
     await templates.macdSignalToEmail(openPos);
+    console.log(" >>>>>>> $$$$$ AFTER macdSignalToEmail() ************** &&&&&&& ");
     //await templates.bandsSignalToEmail(openPos);
     //await macd();
     
