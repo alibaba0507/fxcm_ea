@@ -284,6 +284,7 @@ app.get( '/ping', function( req, res ) {
      
      orders.subscibeClosedPosition();
      await utils.sleep(2000);
+     
      console.log(" >>>>>>> $$$$$ BEOFRE createOrderTemplate() ************** &&&&&&& ");
      let openPos = await templates.createOrderTemplate();
      console.log(" >>>>>>> $$$$$ BEOFRE macdSignalToEmail() ************** &&&&&&& ");

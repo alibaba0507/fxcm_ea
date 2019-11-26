@@ -457,7 +457,7 @@ module.exports.createOrderTemplate = async () =>{
   try{
     let trading = rep.store.get(rep.storeKey.trading);
     loadPairs = JSON.parse(trading);
-    console.log(loadPairs);
+    //console.log(loadPairs);
     
     for (let i = 0;i < loadPairs.length;i++)
     {

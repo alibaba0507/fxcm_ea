@@ -2,6 +2,7 @@
 //const scatteredStore = require('scattered-store');
 const nodemailer = require("nodemailer");
 
+var atr = [];
 const candlesCount = 5000;
 const candleParams = {timestamp :0, BidOpen : 1
               , BidClose:2,BidHigh:3, BidLow:4

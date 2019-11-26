@@ -369,8 +369,8 @@ module.exports.deletePendingPossition = async (orderId) =>{
      let ord_data = await conn.authenticate(cmd);
      if (ord_data.data)
      {
-         console.log(">>>>>>> AFTER DELETE PENDING POSITION [" + (ord_data.data.executed ? "SUCCESS":"FAIL") + "]");
-         console.log(ord_data);
+         console.log(">>>>>>> AFTER DELETE PENDING POSITION [" + (ord_data.statusCode ? "SUCCESS":"FAIL") + "]");
+         console.log(ord_data.data);
      }
      return ord_data;
 }

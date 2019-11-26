@@ -268,3 +268,61 @@ async function ema (candles,ma = 200)
 }
 
 
+/**
+ * Calculate Avarage True Range
+ * @param {*} candles 
+ * @param {*} ATRBuffer 
+ * @param {*} period
+ * @returns Array of ATR values with candles.length 
+ */
+module.exports.ATRcalc = async (candles,period = 14) =>
+{
+    let ExtATRBuffer = new Array(candles.length).fill(0);
+    let ExtTRBuffer = new Array(candles.length).fill(0);
+    let count = candles.length;
+    for(var i=1; i<count; i++)
+    { 
+      ExtTRBuffer[i]=Math.max(candles[i][rep.candleParams.BidHigh]/*High */
+                        ,candles[i-1][rep.candleParams.BidClose]/**Close */)
+        -Math.min(candles[i][rep.candleParams.BidLow]/**Low */,candles[i-1][rep.candleParams.BidClose]/**Close */);
+   }
+    let firstValue=0.0;
+    for(var i=1; i<=period; i++)
+        {
+            ExtATRBuffer[i]=0.0;
+        firstValue+=ExtTRBuffer[i];
+        }// end for
+    //--- calculating the first value of the indicator
+    firstValue/=period;
+    ExtATRBuffer[period]=firstValue;
+   let limit=period+1;
+
+   for(var i=limit; i<count; i++)
+     {
+      ExtTRBuffer[i]=Math.max(candles[i][rep.candleParams.BidHigh]/*High */
+                                         ,candles[i-1][rep.candleParams.BidClose]/**Close */)
+                        -Math.min(candles[i][rep.candleParams.BidLow]/**Low */
+                             ,candles[i-1][rep.candleParams.BidClose]/**Close */);
+       ExtATRBuffer[i]=ExtATRBuffer[i-1]+(ExtTRBuffer[i]-ExtTRBuffer[i-period])/period;
+     }
+     //ExtATRBuffer = ExtTRBuffer;
+     /*
+     console.log(' ######### END ATR Period ' + period + ' ###########');
+     console.log(' ATR [' +Number(ExtTRBuffer[0]) + '][' 
+                     + new Date(Number(candles[0][0])*1000).toUTCString() 
+                     + '] ');//+Point;);
+    console.log(' ATR [' +Number(ExtTRBuffer[1]) + '][' 
+                     + new Date(Number(candles[1][0])*1000).toUTCString()
+                     + ']');
+    console.log(' ATR [' +Number(ExtTRBuffer[2]) + '][' 
+                     + new Date(Number(candles[2][0])*1000).toUTCString() 
+                      +  ']');
+    console.log(' ATR [' +Number(ExtTRBuffer[3]) + '][' 
+                     + new Date(Number(candles[3][0])*1000).toUTCString()
+                      +  ']');
+    */
+   return ExtTRBuffer;
+
+}
+
+
