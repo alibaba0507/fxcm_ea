@@ -14,7 +14,7 @@ let storeKey = require('./repository').storeKey;
 let orders =  require('./fxcm_orders');
 let app = express() ;
 
-let ping_url = 'http://localhost:8080/ping';
+let ping_url =  rep.config.server_url + '/ping';// 'http://localhost:8080/ping';
 //app.use('html', [path.join(__dirname, 'html')]);
 app.use(express.static(__dirname + './html'));
 app.use(bodyParser.urlencoded({ extended: false }));
