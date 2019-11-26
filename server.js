@@ -201,7 +201,7 @@ app.get( '/ping', function( req, res ) {
     console.log(' >>>>> PING SERVER EVERY 1 MIN WORKER ....>>>>>');
      //updateCandles();
      const myURL = new URL(ping_url);
-     console.log("PROTOCOL [" + myURL.protocol + "]");
+     //console.log("PROTOCOL [" + myURL.protocol + "]");
      if (myURL.protocol == 'http:')
      {
         http.get(ping_url, (resp) => {
@@ -220,6 +220,7 @@ app.get( '/ping', function( req, res ) {
         });
     }
     if ((new Date().getMinutes() % 5) == 0) {
+      console.log(' >>>>> PING SERVER EVERY 5 MIN WORKER ....>>>>>');
       rep.store.set("updateOpenPosition",1);
       await updateCandles();  
       //await templates.checkForEmailSignal();

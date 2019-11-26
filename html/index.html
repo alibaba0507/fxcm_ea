@@ -14,6 +14,7 @@
                 <p>This is information of my account trades , info and strategy </p>
                 <ul class="nav nav-pills">
                         <li><a data-toggle="pill" href="#open_possitions">Open Positions</a></li>
+                        <li><a data-toggle="pill" href="#charts">Charts</a></li>
                 </ul>
       
                 <div class="tab-content">
@@ -21,6 +22,11 @@
                                 <h3>Open Possitions</h3>
                                 <div><span>{{orderInfo}}</span></div>
                                 {% include "./OpenPossitions.html" %}
+                        </div>
+                        <div id="charts" class="tab-pane fade">
+                                <h3>Charts</h3>
+                                
+                                {% include "./charts.html" %}
                         </div>
                 </div>
         </div>

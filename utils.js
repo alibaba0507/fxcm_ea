@@ -71,10 +71,10 @@ module.exports.sleep = (milliseconds) => {
       //console.log('Order By ',(orderByIsBuy == 1));
       filterArray = filterArray.filter((e)=>{return ((orderByIsBuy == 1)?(e.isBuy === true):(e.isBuy === false));})
     }
-    console.log(" ORDER COUNT PER PAIR [" + filterArray.length + "]>>>");
+    //console.log(" ORDER COUNT PER PAIR [" + filterArray.length + "]>>>");
     if (sortByOpenTime == true)
     {
-      console.log('>>>>> SORT BY OPEN Time >>>>>');
+     // console.log('>>>>> SORT BY OPEN Time >>>>>');
       filterArray.sort((a,b)=>{
       //  console.log('+++++++ [' + Number(a.time) + '] > [' + Number(b.time) + '] +++++++')
         return Number(b.time) - Number(a.time) 

@@ -45,7 +45,7 @@ module.exports.lastOpenOrder = async (pair,isBuy = false) =>
         acc_open_ords = JSON.parse(acc_open_ords);
         let ords_to_close = await utils.sortAccOrders(acc_open_ords
             , pair, (isBuy === true) ? 1 : 0, null,true);
-        console.log(">>>>>> ["  +pair + "] openORDS[" + acc_open_ords.length + "] after Sort [" + ords_to_close.length + "]>>>");
+       // console.log(">>>>>> ["  +pair + "] openORDS[" + acc_open_ords.length + "] after Sort [" + ords_to_close.length + "]>>>");
         let candles = store.get(pair);
         candles = JSON.parse(candles);
         if (ords_to_close.length > 0) {

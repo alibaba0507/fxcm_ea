@@ -47,7 +47,7 @@ module.exports.macd_bias = async (candles,cnt,startFrom = 0, tf = 5) =>{
   let oldTF = await chooseNextTimeFrame(tf);
   if (biasMacd.bias == -1 && oldTF != tf)
    return await this.macd_bias(candles,count,startFrom,tf);
-  console.log(" >>>>> MACD BIAS [" + candles.length + "][" + count + "]TF["  +tf + "]>>>>>>");
+  //console.log(" >>>>> MACD BIAS [" + candles.length + "][" + count + "]TF["  +tf + "]>>>>>>");
   return biasMacd;
 }
 module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
@@ -92,7 +92,7 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
   result.bias_min = bias_min.bias;
  // if (Number(biasMacd.bias) == 1)
  // { // buy bias
-    if (Number(res.macd.main[1]) > Number(res.top_macd) * 1.61
+    if (Number(res.macd.main[1]) > Number(res.top_macd) * 2.61
          /*&& Number(res.macd.main[1]) < Number(res.macd.signal[1])
          && Number(res.macd.main[1]) >= Number(res.macd.signal[1])*/ 
         && close < open && hi > Number(ma[0]) && low < Number(ma[0]))
@@ -100,7 +100,8 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
           result.closeOrder = 1;
            return result;
         }else if (Number(res.macd.main[1]) < Number(res.top_macd) * 0.62 
-           && close > open && hi > Number(ma[0]) && low < Number(ma[0])
+           && ((close > open && hi > Number(ma[0]) && low < Number(ma[0]))
+                || (Number(res.macd.main[1]) > 0 && Number(res.macd.main[2]) <=0))
              && Number(biasMacd.bias_min) == 1)
           {
             result.openOrder = 1;
@@ -109,14 +110,15 @@ module.exports.macd_siganal = async (candles,cnt,startFrom = 0, tf = 5)=>{
   //}
   //if (Number(biasMacd.bias) == 0)
   //{ // sell bias
-    if (Number(res.macd.main[1])  < 0 && Number(res.macd.main[1])*(-1) > Number(res.bottom_macd) * 1.61 && 
+    if (Number(res.macd.main[1])  < 0 && Number(res.macd.main[1])*(-1) > Number(res.bottom_macd) * 2.61 && 
         close > open && hi > Number(ma[0]) && low < Number(ma[0]))
         {
           result.closeOrder = 0;
            return result;
         }else 
          if ( Number(res.macd.main[1]) > Number(res.bottom_macd)*(-0.62) 
-          && close < open && hi > Number(ma[0]) && low < Number(ma[0])
+          && ((close < open && hi > Number(ma[0]) && low < Number(ma[0]))
+              || (Number(res.macd.main[1]) < 0 && Number(res.macd.main[2]) >= 0))
             && Number(biasMacd.bias_min) == 0)
         {
           result.openOrder = 0;

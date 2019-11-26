@@ -286,8 +286,8 @@ module.exports.macdSignalToEmail = async (openPos) =>
   openPos.forEach(async (e) =>{
     //let row = [];
     let cells =[];
-    let pair  =  e.pair.replace(/([^a-z0-9]+)/gi, '');
-    let macdLastHour = rep.store.get("macd_" + pair);
+    //let pair  =  e.pair.replace(/([^a-z0-9]+)/gi, '');
+    //let macdLastHour = rep.store.get("macd_" + pair);
     /*
     if ((!macdLastHour || macdLastHour != d.getHours()) && d.getMinutes() > 50 )
     {
@@ -342,14 +342,17 @@ module.exports.macdSignalToEmail = async (openPos) =>
     {
       if (typeof e.macd.closestOrder !== 'undefined')
       {
-        if (e.macd.closeOrder == 1)
+                
+        if (Number( e.macd.closeOrder) == 1)
         {
+          console.log(">>>>>>> CLOSE BUY  >>>>>>");
           cells.push(e.pair);
           cells.push("BIAS(" + (e.macd.bias == 1?"<font color=\"green\">BUY"
                         : "<font color=\"red\">SELL") + "</font>) CLOSE BUY");
         }
-        if (e.macd.closeOrder == 0)
+        if (Number(e.macd.closeOrder) == 0)
         {
+          console.log(">>>>>>> CLOSE SELL  >>>>>>");
           cells.push(e.pair);
           cells.push("BIAS(" + (e.macd.bias == 1?"<font color=\"green\">BUY"
                         : "<font color=\"red\">SELL") + "</font>) CLOSE SELL");
@@ -357,14 +360,16 @@ module.exports.macdSignalToEmail = async (openPos) =>
       }
       else if (typeof e.macd.openOrder !== 'undefined')
       {
-        if (e.macd.openOrder == 1)
+        if (Number(e.macd.openOrder) == 1)
         {
+          console.log(">>>>>>> OPEN BUY  >>>>>>");
           cells.push(e.pair);
           cells.push("BIAS(" + (e.macd.bias == 1?"<font color=\"green\">BUY"
                         : "<font color=\"red\">SELL") + "</font>) OPEN BUY");
         }
-        if (e.macd.openOrder == 0)
+        if (Number(e.macd.openOrder) == 0)
         {
+          console.log(">>>>>>> OPEN SELL  >>>>>>");
           cells.push(e.pair);
           cells.push("BIAS(" + (e.macd.bias == 1?"<font color=\"green\">BUY"
                         : "<font color=\"red\">SELL") + "</font>) OPEN SELL");
@@ -404,7 +409,7 @@ module.exports.macdSignalToEmail = async (openPos) =>
     }
     
   });//end openPos.forEach((e) =>{
-  if (rows.length)
+  if (rows.length > 0)
   {
     let htmlEmailBody = "New MACD Signals for pairs: <br>"
     + "<a href=\"" + rep.config.server_url + "/open_orders_291267s" + "\">Check Orders Online</a><br>" 
