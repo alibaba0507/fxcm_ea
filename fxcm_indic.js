@@ -14,9 +14,9 @@ let utils = require('./utils');
  module.exports.calcMACDRange = async (candles, cnt,startFrom = 0, tf =5) =>{
   if (tf != 5)
    candles = await utils.convertCandlesByTime(candles,tf); 
-   candles.sort((a, b) => {
+  /* candles.sort((a, b) => {
     return (b[0] - a[0]); // sort decending by time where newest time is first
-  });
+  });*/
   let macd = await this.macd(candles);
   let avrg_max = 0;
   let avrg_min = 0;
@@ -109,10 +109,12 @@ module.exports.ma = async (candles,ma = 200) =>{
     let i = 1
     let pos=candles.length-ma-1;
     let MABuffer = new Array(candles.length).fill(0);
+    /*
     candles.sort((a, b) => {
       return (b[0] - a[0]); // sort decending by time where newest time is first
     });
- //---- initial accumulation
+    */
+    //---- initial accumulation
     if(pos<ma) pos=ma;
     for(i=1;i<ma;i++,pos--)
     {
