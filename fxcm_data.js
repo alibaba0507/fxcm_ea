@@ -132,7 +132,7 @@ module.exports.loadCandles = async (indx = 0, histCandles = 3500) =>{
               }// end if (candles.length < histCandles - 1)
               if (resultInMinutes && Number(resultInMinutes) > 0) { // retreving candles
                 let cmd = '{ "method":"GET", "resource":"/candles/' + loadPairs[indx].id + '/m5", "params": { "num":' + resultInMinutes + ' } }'
-                console.log('>>>>> UPDATE CANDLES ... ', cmd);
+                //console.log('>>>>> UPDATE CANDLES ... ', cmd);
                 let action = store.get('subscribe');
                 if (action)
                   await this.subscibe(true);
