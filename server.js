@@ -216,6 +216,7 @@ app.get( '/ping', function( req, res ) {
    
     console.log(' >>>>> PING SERVER EVERY 1 MIN WORKER ....>>>>>');
      //updateCandles();
+     ping_url = rep.config.server_url + '/ping';
      const myURL = new URL(ping_url);
      //console.log("PROTOCOL [" + myURL.protocol + "]");
      if (myURL.protocol == 'http:')
