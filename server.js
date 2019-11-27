@@ -26,6 +26,7 @@ nunjucks.configure( PATH_TO_TEMPLATES, {
     express: app
 } ) ;
 
+
 app.post("/open_order",async (req,res)=>{
    
   //req.url = "/open_orders_291267?ord=";// + JSON.stringify(result);
@@ -125,6 +126,14 @@ app.post("/update_token", async (req,res)=>{
 
 })
 
+app.get( '/sendMail', async function( req, res ) {
+  if (req.query.msg)
+  {
+     let subject = (req.query.subject)?req.query.subject:"Fx Alert";
+     rep.mail(subject,req.query.msg);
+  }
+  res.send(' <b> Mail has been send.....');
+})
 
 app.get( '/close', async function( req, res ) {
   let ord = require('./fxcm_orders');
