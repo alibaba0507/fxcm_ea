@@ -29,7 +29,7 @@
                                 {% endif %}
                                 -- L({{ item.lastBuy_lots}})  -- $({{item.lastBuy_grossPl | round(2)}})
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <a href="/close?tradeId={{ item.lastBuy_tradeId }}">X</a>
+                                <a href="{{server_url}}/close?tradeId={{ item.lastBuy_tradeId }}">X</a>
                         </td>
                         <td>
                                 {% if item.lastSell_pips < 0 %}
@@ -39,7 +39,7 @@
                                 {% endif %}
                                 -- L({{ item.lastSell_lots}}) -- $({{item.lastSell_grossPl | round(2)}})
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <a href="/close?tradeId={{ item.lastSell_tradeId }}">X</a>
+                                <a href="{{server_url}}/close?tradeId={{ item.lastSell_tradeId }}">X</a>
                         </td>
                         <td>
                                 {% if item.closeBuy_pips < 0 %}
@@ -49,7 +49,7 @@
                                 {% endif %}
                                 -- L({{ item.closeBuy_lots}})-- $({{item.closeBuy_grossPl | round(2)}})
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <a href="/close?tradeId={{ item.closeBuy_tradeId }}">X</a>
+                                <a href="{{server_url}}/close?tradeId={{ item.closeBuy_tradeId }}">X</a>
                         </td>
                         <td>
                                 {% if item.closeSell_pips < 0 %}
@@ -59,15 +59,15 @@
                                 {% endif %}
                                 -- L({{ item.closeSell_lots}}) -- $({{item.closeSell_grossPl | round(2)}})
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <a href="/close?tradeId={{ item.lastSell_tradeId }}">X</a>
+                                <a href="{{server_url}}/close?tradeId={{ item.lastSell_tradeId }}">X</a>
                         </td>
                         <td>
-                         <a href="/open?pair={{ item.pair }}&type=1" >BUY</a> <br>
-                         <a href="/open?pair={{ item.pair }}&type=0" >SELL</a> <br>
+                         <a href="{{server_url}}/open?pair={{ item.pair }}&type=1" >BUY</a> <br>
+                         <a href="{{server_url}}/open?pair={{ item.pair }}&type=0" >SELL</a> <br>
                         </td>
                         <td>
-                                <a href="/openFuture?pair={{ item.pair }}&type=1" >Future BUY</a> <br>
-                                <a href="/openFuture?pair={{ item.pair }}&type=0" >Future SELL</a> <br>
+                                <a href="{{server_url}}/openFuture?pair={{ item.pair }}&type=1" >Future BUY</a> <br>
+                                <a href="{{server_url}}/openFuture?pair={{ item.pair }}&type=0" >Future SELL</a> <br>
                         </td>
                 </tr>
                 {% endfor %}

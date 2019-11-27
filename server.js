@@ -149,6 +149,7 @@ app.get( '/open_orders_291267', async ( req, res )=> {
   let ordInfo =  (req.query.ord)? (req.query.ord):"";
   return res.render( 'index.html',{
       orderInfo:ordInfo,
+      server_url:rep.config.server_url,
       open_positions:openPos
   });
 });
@@ -162,6 +163,7 @@ app.get( '/open_orders_291267_short', async ( req, res )=> {
   let ordInfo =  (req.query.ord)? (req.query.ord):"";
   return res.render( 'OpenPossitions.html',{
       orderInfo:ordInfo,
+      server_url:rep.config.server_url,
       open_positions:openPos
   });
 });
