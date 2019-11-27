@@ -466,7 +466,8 @@ module.exports.createOrderTemplate = async () =>{
       candles = candles.sort((a, b) => {
         return (b[0] - a[0]); // sort decending by time where newest time is first
       });
-      let s = await ea.macd_siganal(candles,500);
+      let s;
+      //s =  await ea.macd_siganal(candles,500);
       //let band = await band_ea.band_siganal(candles);//     await indic.bands(candles,ma12,12);
       let lots = await ords.orderLots(loadPairs[i].pair);
       let ordBuy = await ords.lastOpenOrder(loadPairs[i].pair,true);

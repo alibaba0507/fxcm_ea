@@ -152,6 +152,20 @@ app.get( '/open_orders_291267', async ( req, res )=> {
       open_positions:openPos
   });
 });
+
+app.get( '/open_orders_291267_short', async ( req, res )=> {
+  //await require('./fxcm_orders').updateOpenPositions();
+  let openPos = await templates.createOrderTemplate();
+ // await templates.macdSignalToEmail(openPos);
+  console.log(" >>>>>> get Info ",openPos);
+  //let clientData = !{ JSON.stringify(openPos) };
+  let ordInfo =  (req.query.ord)? (req.query.ord):"";
+  return res.render( 'OpenPossitions.html',{
+      orderInfo:ordInfo,
+      open_positions:openPos
+  });
+});
+
 app.get( '/ping', function( req, res ) {
     console.log(' >>>>>>> Calling Ping Server ....');
     res.send(' <b> Ping Success .....');
@@ -285,11 +299,13 @@ app.get( '/ping', function( req, res ) {
      orders.subscibeClosedPosition();
      await utils.sleep(2000);
      
-     console.log(" >>>>>>> $$$$$ BEOFRE createOrderTemplate() ************** &&&&&&& ");
+     /*
+    console.log(" >>>>>>> $$$$$ BEOFRE createOrderTemplate() ************** &&&&&&& ");
      let openPos = await templates.createOrderTemplate();
      console.log(" >>>>>>> $$$$$ BEOFRE macdSignalToEmail() ************** &&&&&&& ");
     await templates.macdSignalToEmail(openPos);
     console.log(" >>>>>>> $$$$$ AFTER macdSignalToEmail() ************** &&&&&&& ");
+    */
     //await templates.bandsSignalToEmail(openPos);
     //await macd();
     
