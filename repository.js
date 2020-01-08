@@ -183,7 +183,7 @@ var mail = (subject,htmlBody,indx) =>
 };
 
   var config = {};
-  config.server_url = "http:/localhost:8080";
+  config.server_url = "https://fxcm-ea.herokuapp.com/"; //"http:/localhost:8080";
   config.minLot = 2;
   config.maxLot = 6;
  //Y7JMSG0OG36LTWHP
