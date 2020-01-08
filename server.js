@@ -225,26 +225,30 @@ app.get( '/ping', function( req, res ) {
    
     console.log(' >>>>> PING SERVER EVERY 1 MIN WORKER ....>>>>>');
      //updateCandles();
-     ping_url = rep.config.server_url + '/ping';
-     const myURL = new URL(ping_url);
-     //console.log("PROTOCOL [" + myURL.protocol + "]");
-     if (myURL.protocol == 'http:')
-     {
-        http.get(ping_url, (resp) => {
-            let htmlData = '';
-            resp.on('data', (chunk) => {htmlData += chunk;});
-            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);*/});
-            }).on("error", (err) => { console.log("Error: " + err.message);
-        });
-     }else
-     {
-        https.get(ping_url, (resp) => {
-            let htmlData = '';
-            resp.on('data', (chunk) => {htmlData += chunk;});
-            resp.on('end', () => { /* console.log(JSON.parse(data).explanation);*/});
-            }).on("error", (err) => { console.log("Error: " + err.message);
-        });
-    }
+	if ((new Date().getMinutes() % 10) == 0) {
+		 
+		 ping_url = rep.config.server_url + '/ping';
+		 console.log(' >>>>> PING SERVER EVERY 10 MIN WORKER ....[' + ping_url + ']>>>>>');
+		 const myURL = new URL(ping_url);
+		 //console.log("PROTOCOL [" + myURL.protocol + "]");
+		 if (myURL.protocol == 'http:')
+		 {
+			http.get(ping_url, (resp) => {
+				let htmlData = '';
+				resp.on('data', (chunk) => {htmlData += chunk;});
+				resp.on('end', () => { /* console.log(JSON.parse(data).explanation);*/});
+				}).on("error", (err) => { console.log("Error: " + err.message);
+			});
+		 }else
+		 {
+			https.get(ping_url, (resp) => {
+				let htmlData = '';
+				resp.on('data', (chunk) => {htmlData += chunk;});
+				resp.on('end', () => { /* console.log(JSON.parse(data).explanation);*/});
+				}).on("error", (err) => { console.log("Error: " + err.message);
+			});
+		}
+	}
     if ((new Date().getMinutes() % 5) == 0) {
       console.log(' >>>>> PING SERVER EVERY 5 MIN WORKER ....>>>>>');
       rep.store.set("updateOpenPosition",1);
